@@ -11,7 +11,16 @@
 
 - **MegaEVM**: https://github.com/megaeth-labs/mega-evm
 - **MegaEVM Spec (MiniRex)**: https://github.com/megaeth-labs/mega-evm/blob/main/specs/MiniRex.md
-- **Token List**: https://github.com/megaeth-labs/mega-tokenlist
+
+## Token List
+
+**Official:** https://github.com/megaeth-labs/mega-tokenlist
+
+The canonical source for verified token addresses, symbols, decimals, and logos on MegaETH. Use this repo to:
+- Look up token contract addresses
+- Get token metadata (name, symbol, decimals)
+- Access official token logos
+- Verify token legitimacy
 
 ## Tools
 

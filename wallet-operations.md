@@ -153,13 +153,19 @@ const tx = {
 
 ## Token Operations
 
-### Common Token Addresses (Mainnet)
+### Token Addresses
+
+**Official token list:** https://github.com/megaeth-labs/mega-tokenlist
+
+Common tokens (Mainnet):
 
 | Token | Address |
 |-------|---------|
 | WETH | `0x4200000000000000000000000000000000000006` |
 | MEGA | `0x28B7E77f82B25B95953825F1E3eA0E36c1c29861` |
 | USDM | `0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7` |
+
+For the full list of verified tokens, logos, and metadata, see the [mega-tokenlist](https://github.com/megaeth-labs/mega-tokenlist) repo.
 
 ### Transfer ERC20
 
