@@ -180,6 +180,120 @@ contract MyTest is Test {
 }
 ```
 
+## SSTORE2: On-Chain Data Storage
+
+For storing large immutable data on-chain (HTML, images, metadata), use the **SSTORE2** pattern — store data as contract bytecode instead of storage slots.
+
+### Why SSTORE2 on MegaETH?
+
+| Approach | Write Cost | Read Cost |
+|----------|------------|-----------|
+| SSTORE (storage slots) | 2M+ gas per new slot | 100-2100 gas |
+| SSTORE2 (bytecode) | ~10K gas per byte | **FREE** (EXTCODECOPY) |
+
+SSTORE2 is ideal for write-once, read-many data — content is immutable once deployed.
+
+### How It Works
+
+1. Deploy a contract with data as bytecode
+2. Read data via `EXTCODECOPY` (no gas for view calls)
+
+```solidity
+// Writing: Deploy data as contract bytecode
+library SSTORE2 {
+    function write(bytes memory data) internal returns (address) {
+        // Prepend STOP opcode so contract can't be called
+        bytes memory bytecode = abi.encodePacked(
+            hex"00", // STOP opcode
+            data
+        );
+        
+        address pointer;
+        assembly {
+            pointer := create(0, add(bytecode, 32), mload(bytecode))
+        }
+        require(pointer != address(0), "Deploy failed");
+        return pointer;
+    }
+    
+    function read(address pointer) internal view returns (bytes memory) {
+        uint256 size;
+        assembly { size := extcodesize(pointer) }
+        
+        bytes memory data = new bytes(size - 1); // Skip STOP opcode
+        assembly {
+            extcodecopy(pointer, add(data, 32), 1, sub(size, 1))
+        }
+        return data;
+    }
+}
+```
+
+### MegaETH Gas Estimation for SSTORE2
+
+```javascript
+// MegaETH multidimensional gas model for bytecode deployment
+const MEGAETH_GAS = {
+  INTRINSIC_COMPUTE: 21_000n,
+  INTRINSIC_STORAGE: 39_000n,
+  CONTRACT_CREATION_COMPUTE: 32_000n,
+  CODE_DEPOSIT_PER_BYTE: 10_000n,
+  CALLDATA_NONZERO_PER_BYTE: 160n,
+};
+
+function estimateDeployGas(dataSizeBytes) {
+  const dataSize = BigInt(dataSizeBytes);
+  
+  const computeGas = MEGAETH_GAS.INTRINSIC_COMPUTE 
+    + MEGAETH_GAS.CONTRACT_CREATION_COMPUTE;
+  
+  const storageGas = MEGAETH_GAS.INTRINSIC_STORAGE
+    + (dataSize * MEGAETH_GAS.CODE_DEPOSIT_PER_BYTE)
+    + (dataSize * MEGAETH_GAS.CALLDATA_NONZERO_PER_BYTE);
+  
+  return (computeGas + storageGas) * 150n / 100n; // 50% buffer
+}
+```
+
+### Use Cases
+
+- **On-chain websites/HTML** — permanent, censorship-resistant hosting
+- **NFT metadata** — fully on-chain images/JSON
+- **Large configs** — immutable protocol parameters
+- **Data availability** — store proofs, attestations
+
+### Chunking Large Data
+
+For data > 24KB, chunk into multiple contracts:
+
+```javascript
+const CHUNK_SIZE = 15000; // 15KB per chunk
+
+function chunkData(data) {
+  const chunks = [];
+  for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+    chunks.push(data.slice(i, i + CHUNK_SIZE));
+  }
+  return chunks;
+}
+```
+
+### Solady Implementation
+
+Solady provides an optimized SSTORE2:
+
+```solidity
+import {SSTORE2} from "solady/src/utils/SSTORE2.sol";
+
+// Write
+address pointer = SSTORE2.write(data);
+
+// Read
+bytes memory data = SSTORE2.read(pointer);
+```
+
+**Reference implementation:** See [warren-deploy](https://clawdhub.ai/planetai87/warren-deploy) for a complete on-chain website deployment system using SSTORE2 on MegaETH.
+
 ## EIP-6909: Minimal Multi-Token Standard
 
 For contracts managing multiple token types, prefer [EIP-6909](https://eips.ethereum.org/EIPS/eip-6909) over ERC-1155.

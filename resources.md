@@ -24,6 +24,18 @@ The canonical source for verified token addresses, symbols, decimals, and logos 
 
 ## Tools
 
+### Warren Deploy (On-Chain Websites)
+Deploy websites and files permanently on MegaETH using SSTORE2:
+- **Skill**: https://clawdhub.ai/planetai87/warren-deploy
+- **Website**: https://megawarren.xyz
+- **Install**: `clawdhub install warren-deploy`
+
+Features:
+- SSTORE2 bytecode storage (cheap reads)
+- Automatic chunking for large files (up to 500KB)
+- MegaETH-specific gas estimation
+- Stress test workflows
+
 ### mega-evme CLI
 Transaction replay and debugging:
 ```bash
