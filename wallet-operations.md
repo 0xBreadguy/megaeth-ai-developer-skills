@@ -93,8 +93,8 @@ MegaETH created `realtime_*` first; `*Sync` was later standardized as EIP-7966. 
 const signedTx = await wallet.signTransaction({
   to: recipient,
   value: parseEther('0.1'),
-  gas: 21000n,
-  maxFeePerGas: 1000000n, // 0.001 gwei
+  gas: 60000n,                // MegaETH intrinsic gas (not 21000)
+  maxFeePerGas: 1000000n,     // 0.001 gwei
   maxPriorityFeePerGas: 0n
 });
 
@@ -132,13 +132,13 @@ node src/transfer.js megaeth 0xRecipient 0.1 --yes --json
 
 ## Gas Configuration
 
-MegaETH has stable, low gas costs:
+MegaETH has stable, low gas costs but different intrinsic gas than standard EVM:
 
 ```typescript
 const tx = {
   to: recipient,
   value: parseEther('0.1'),
-  gas: 21000n,                    // Standard transfer
+  gas: 60000n,                    // MegaETH intrinsic gas (not 21000!)
   maxFeePerGas: 1000000n,         // 0.001 gwei (base fee)
   maxPriorityFeePerGas: 0n        // Not needed unless congested
 };
@@ -146,7 +146,9 @@ const tx = {
 
 **Tips:**
 - Base fee is stable at 0.001 gwei
+- Simple ETH transfers need **60,000 gas** on MegaETH (not 21,000)
 - Don't add buffers (viem adds 20% by default — override it)
+- When in doubt, use `eth_estimateGas` — MegaEVM costs differ from standard EVM
 - Hardcode gas limits for known operations
 
 ## Token Operations

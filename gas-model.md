@@ -35,30 +35,33 @@ const priority = await client.request({
 
 ## Gas Estimation
 
-### Skip When Possible
+### MegaEVM Intrinsic Gas
 
-Hardcode gas limits to save a round-trip:
+> ⚠️ **Important:** MegaEVM has different intrinsic gas costs than standard EVM. A simple ETH transfer costs **60,000 gas** on MegaETH, not 21,000.
+
+If you hardcode gas limits, use MegaETH-specific values:
 
 ```javascript
-// Common operations - safe to hardcode
+// Common operations - MegaETH gas limits
 const gasLimits = {
-  transfer: 21000n,
-  erc20Transfer: 65000n,
-  swap: 300000n,
+  transfer: 60000n,       // NOT 21000 like standard EVM
+  erc20Transfer: 100000n, // Higher than standard EVM
+  erc20Approve: 80000n,
+  swap: 350000n,
 };
 
-// Send without estimation
+// Send with correct gas limit
 await wallet.sendTransaction({
   to: recipient,
   value: amount,
-  gasLimit: 21000n,
+  gasLimit: 60000n,       // MegaETH intrinsic gas
   maxFeePerGas: 1000000n,
 });
 ```
 
-### When Estimation is Needed
+### When to Use Remote Estimation
 
-MegaEVM has different opcode costs — **always use remote estimation**:
+For any non-trivial operation, use `eth_estimateGas` — MegaEVM opcode costs differ from standard EVM:
 
 ```javascript
 // ✅ Correct: remote estimation
