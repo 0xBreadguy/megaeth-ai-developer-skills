@@ -78,9 +78,15 @@ node src/balance.js megaeth 0x4200000000000000000000000000000000000006 --json
 
 ## Send Transactions
 
-### Instant Receipts with eth_sendRawTransactionSync
+### Instant Receipts
 
-MegaETH supports EIP-7966 — get receipts in <10ms:
+MegaETH supports synchronous transaction submission — get receipts in <10ms.
+
+**Two equivalent methods:**
+- `realtime_sendRawTransaction` — MegaETH original
+- `eth_sendRawTransactionSync` — EIP-7966 standard (recommended)
+
+MegaETH created `realtime_*` first; `*Sync` was later standardized as EIP-7966. Both are proxied and functionally identical. Use `eth_sendRawTransactionSync` for cross-chain compatibility.
 
 ```typescript
 // Sign transaction

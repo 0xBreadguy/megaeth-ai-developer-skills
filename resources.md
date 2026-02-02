@@ -52,6 +52,8 @@ https://github.com/megaeth-labs/mega-evm/blob/main/scripts/trace_opcode_gas.py
 Synchronous transaction submission with immediate receipt:
 https://ethereum-magicians.org/t/eip-7966-eth-sendrawtransactionsync-method/24640
 
+**Note:** MegaETH originally created `realtime_sendRawTransaction`. The `eth_sendRawTransactionSync` method was later standardized as EIP-7966. MegaETH proxies both — they are functionally equivalent. Use `eth_sendRawTransactionSync` for cross-chain compatibility.
+
 Supported in:
 - viem (native)
 - wagmi (native)

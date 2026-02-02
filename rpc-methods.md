@@ -11,16 +11,36 @@ Third-party providers: Alchemy, QuickNode (recommended for geo-distributed acces
 
 ## MegaETH-Specific Methods
 
-### eth_sendRawTransactionSync (EIP-7966)
+### Instant Transaction Receipts
 
-Returns receipt immediately instead of just tx hash.
+MegaETH supports synchronous transaction submission — get your receipt in <10ms instead of polling.
+
+**Two equivalent methods:**
+
+| Method | Origin | Status |
+|--------|--------|--------|
+| `realtime_sendRawTransaction` | MegaETH original | Supported |
+| `eth_sendRawTransactionSync` | EIP-7966 standard | Supported (proxied) |
+
+**History:** MegaETH created `realtime_sendRawTransaction` first. Later, `eth_sendRawTransactionSync` was standardized as EIP-7966. MegaETH now proxies both — they are functionally identical. Use whichever you prefer; `eth_sendRawTransactionSync` is recommended for cross-chain compatibility.
 
 ```bash
+# Both work identically:
 curl -X POST https://mainnet.megaeth.com/rpc \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
     "method": "eth_sendRawTransactionSync",
+    "params": ["0x...signedTx"],
+    "id": 1
+  }'
+
+# Or use the original:
+curl -X POST https://mainnet.megaeth.com/rpc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "realtime_sendRawTransaction",
     "params": ["0x...signedTx"],
     "id": 1
   }'
