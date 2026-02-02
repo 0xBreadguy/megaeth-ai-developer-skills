@@ -57,6 +57,15 @@ https://github.com/megaeth-labs/mega-evm/blob/main/scripts/trace_opcode_gas.py
 
 ## Standards
 
+### EIP-6909 (Minimal Multi-Token)
+Simplified alternative to ERC-1155 — no callbacks, minimal interface, granular approvals:
+https://eips.ethereum.org/EIPS/eip-6909
+
+**Why use on MegaETH:**
+- Single contract for multiple tokens (fewer SSTORE operations)
+- No mandatory callbacks (less gas)
+- Solady provides gas-optimized implementation
+
 ### EIP-7966 (eth_sendRawTransactionSync)
 Synchronous transaction submission with immediate receipt:
 https://ethereum-magicians.org/t/eip-7966-eth-sendrawtransactionsync-method/24640

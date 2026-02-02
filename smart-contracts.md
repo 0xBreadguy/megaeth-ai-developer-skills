@@ -180,6 +180,86 @@ contract MyTest is Test {
 }
 ```
 
+## EIP-6909: Minimal Multi-Token Standard
+
+For contracts managing multiple token types, prefer [EIP-6909](https://eips.ethereum.org/EIPS/eip-6909) over ERC-1155.
+
+### Why EIP-6909 on MegaETH?
+
+| Feature | MegaETH Benefit |
+|---------|-----------------|
+| No mandatory callbacks | Less gas, simpler integrations |
+| No batching in spec | Allows MegaETH-optimized implementations |
+| Single contract | Fewer SSTORE operations (expensive) |
+| Granular approvals | Per-token-ID OR full operator access |
+| Minimal interface | Smaller bytecode |
+
+### Storage Efficiency
+
+One EIP-6909 contract vs. N separate ERC-20 contracts:
+
+```solidity
+// ❌ Deploying many ERC-20s = many new storage slots
+// Each contract: new code, new storage initialization
+
+// ✅ Single EIP-6909 = shared storage
+// Multiple token IDs in one contract, slot reuse
+```
+
+### Basic Implementation
+
+```solidity
+// Using Solady's ERC6909 (gas-optimized)
+import {ERC6909} from "solady/src/tokens/ERC6909.sol";
+
+contract MultiToken is ERC6909 {
+    function name(uint256 id) public view override returns (string memory) {
+        // Return name for token ID
+    }
+    
+    function symbol(uint256 id) public view override returns (string memory) {
+        // Return symbol for token ID
+    }
+    
+    function tokenURI(uint256 id) public view override returns (string memory) {
+        // Return metadata URI for token ID
+    }
+    
+    function mint(address to, uint256 id, uint256 amount) external {
+        _mint(to, id, amount);
+    }
+}
+```
+
+### Key Differences from ERC-1155
+
+| | ERC-1155 | EIP-6909 |
+|-|----------|----------|
+| Callbacks | Required | None |
+| Batch transfers | In spec | Implementation choice |
+| Approvals | Operator only | Operator + per-ID allowance |
+| Complexity | Higher | Minimal |
+
+### Use Cases
+
+- **DEXes**: LP tokens for multiple pairs in one contract
+- **Games**: Multiple item/asset types
+- **DeFi vaults**: Multiple share classes
+- **NFT editions**: Fungible editions of NFTs
+
+### Solady Implementation
+
+Solady provides a gas-optimized EIP-6909:
+```bash
+forge install vectorized/solady
+```
+
+```solidity
+import {ERC6909} from "solady/src/tokens/ERC6909.sol";
+```
+
+**Docs**: https://github.com/Vectorized/solady/blob/main/src/tokens/ERC6909.sol
+
 ## OP Stack Compatibility
 
 MegaETH uses OP Stack. Standard bridge contracts and predeploys are available:
