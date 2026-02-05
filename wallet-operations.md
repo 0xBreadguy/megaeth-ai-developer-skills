@@ -293,12 +293,88 @@ const hash = await wallet.sendTransaction(tx);
 const receipt = await tx.wait(); // ~100-200ms total
 ```
 
+## Nonce Management
+
+For single transactions, the RPC handles nonces automatically. For **rapid/batch transactions**, manage nonces locally to avoid "already known" errors:
+
+```typescript
+import { useRef } from 'react';
+
+// Track last used nonce per chain
+const lastNonceRef = useRef<Record<number, number>>({});
+
+async function getNextNonce(
+  client: PublicClient, 
+  address: `0x${string}`,
+  chainId: number
+): Promise<number> {
+  // Fetch pending nonce from network
+  let nonce = await client.getTransactionCount({ 
+    address, 
+    blockTag: 'pending' 
+  });
+  
+  // If we've used this nonce already, increment
+  const lastUsed = lastNonceRef.current[chainId] ?? -1;
+  if (lastUsed >= nonce) {
+    nonce = lastUsed + 1;
+  }
+  
+  // Track for next call
+  lastNonceRef.current[chainId] = nonce;
+  return nonce;
+}
+```
+
+### Why This Matters
+
+MegaETH's ~10ms blocks mean transactions confirm quickly, but if you send multiple txs in rapid succession (e.g., trading bot, batch operations), the second tx may hit the RPC before the first confirms. Without local tracking, both get the same nonce → "already known" error.
+
+### Backend/Bot Pattern
+
+```typescript
+class NonceManager {
+  private nonces: Map<string, number> = new Map();
+  private locks: Map<string, Promise<void>> = new Map();
+
+  async getNextNonce(client: PublicClient, address: string): Promise<number> {
+    // Serialize nonce fetches per address
+    const existing = this.locks.get(address);
+    if (existing) await existing;
+
+    let resolve: () => void;
+    this.locks.set(address, new Promise(r => resolve = r));
+
+    try {
+      const networkNonce = await client.getTransactionCount({ 
+        address: address as `0x${string}`, 
+        blockTag: 'pending' 
+      });
+      
+      const lastUsed = this.nonces.get(address) ?? -1;
+      const nonce = Math.max(networkNonce, lastUsed + 1);
+      
+      this.nonces.set(address, nonce);
+      return nonce;
+    } finally {
+      resolve!();
+      this.locks.delete(address);
+    }
+  }
+
+  // Call after tx confirms or fails
+  reset(address: string) {
+    this.nonces.delete(address);
+  }
+}
+```
+
 ## Error Handling
 
 | Error | Cause | Solution |
 |-------|-------|----------|
 | "nonce too low" | Tx already executed | Check receipt, don't retry |
-| "already known" | Tx pending | Wait for confirmation |
+| "already known" | Tx pending or duplicate nonce | Use nonce manager, increment locally |
 | "insufficient funds" | Not enough ETH | Check balance, fund wallet |
 | "intrinsic gas too low" | Gas limit too low | Increase gas or use remote estimation |
 
