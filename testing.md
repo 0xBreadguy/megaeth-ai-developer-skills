@@ -74,9 +74,7 @@ With `eth_sendRawTransactionSync`, this can mean:
 **Debug:**
 ```bash
 # Check current nonce
-cast call --rpc-url <endpoint> \
-  --method eth_getTransactionCount \
-  <address> pending
+cast nonce <address> --rpc-url <endpoint> --block pending
 ```
 
 ### "Block Pruned" on eth_call
