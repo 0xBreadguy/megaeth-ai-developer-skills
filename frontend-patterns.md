@@ -182,7 +182,7 @@ const gasPrice = 1000000n; // 0.001 gwei
 const tx = await walletClient.sendTransaction({
   to: recipient,
   value: amount,
-  gas: 21000n,
+  gas: 60000n,                // MegaETH intrinsic gas (not 21000!)
   maxFeePerGas: 1000000n,
   maxPriorityFeePerGas: 0n
 });
