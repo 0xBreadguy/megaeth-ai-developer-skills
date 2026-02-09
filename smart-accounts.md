@@ -33,6 +33,19 @@ export const megaethTestnet = defineChain({
 const client = createPublicClient({ chain: megaeth, transport: http() });
 ```
 
+## Environment Setup
+
+```typescript
+import { getSmartAccountsEnvironment } from '@metamask/smart-accounts-kit';
+
+// Get all contract addresses for a chain
+const environment = getSmartAccountsEnvironment(4326); // MegaETH mainnet
+
+// If contracts aren't deployed yet on MegaETH:
+import { deploySmartAccountsEnvironment } from '@metamask/smart-accounts-kit';
+await deploySmartAccountsEnvironment({ client, account: deployer });
+```
+
 ## Account Types
 
 | Type | Implementation | Use Case |
@@ -124,11 +137,12 @@ const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
 
 ## EOA-Based Delegation Redemption
 
-For EOA signers, bypass the bundler entirely using `eth_sendRawTransactionSync`:
+For EOA signers, bypass the bundler entirely. On MegaETH, use `realtime_sendRawTransaction` for instant receipts:
 
 ```typescript
 import { createWalletClient } from 'viem';
-import { DelegationFramework } from '@metamask/smart-accounts-kit';
+import { DelegationManager } from '@metamask/smart-accounts-kit/contracts';
+import { createExecution, ExecutionMode } from '@metamask/smart-accounts-kit';
 
 const walletClient = createWalletClient({
   account: owner,
@@ -136,13 +150,17 @@ const walletClient = createWalletClient({
   transport: http(),
 });
 
+const execution = createExecution({ target: tokenAddress, callData });
+
+const redeemCalldata = DelegationManager.encode.redeemDelegations({
+  delegations: [[signedDelegation]],
+  modes: [ExecutionMode.SingleDefault],
+  executions: [[execution]],
+});
+
 const tx = await walletClient.sendTransaction({
-  to: '0xdb9B1e94B5b69Df7e401DDbedE43491141047dB3', // DelegationManager
-  data: DelegationFramework.redeemDelegationsCalldata({
-    delegations: [[signedDelegation]],
-    modes: [0n],
-    executions: [execution],
-  }),
+  to: environment.DelegationManager,
+  data: redeemCalldata,
 });
 ```
 
@@ -161,32 +179,41 @@ const tx = await walletClient.sendTransaction({
 Request permissions via MetaMask extension (Flask 13.5.0+):
 
 ```typescript
-const grantedPermissions = await provider.request({
-  method: 'wallet_grantPermissions',
-  params: [{
-    permissions: [{
+import { erc7715ProviderActions } from '@metamask/smart-accounts-kit/actions';
+
+const walletClient = createWalletClient({
+  transport: custom(window.ethereum),
+}).extend(erc7715ProviderActions());
+
+const grantedPermissions = await walletClient.requestExecutionPermissions([
+  {
+    chainId: megaeth.id,
+    expiry: Math.floor(Date.now() / 1000) + 86400,
+    signer: {
+      type: 'account',
+      data: { address: sessionAccount.address },
+    },
+    permission: {
       type: 'native-token-transfer',
-      policies: [],
-      required: true,
-      data: {
-        allowance: '0xDE0B6B3A7640000', // 1 ETH
-      },
-    }],
-    expiry: Math.floor(Date.now() / 1000) + 86400, // 24h
-  }],
-});
+      data: { allowance: parseEther('1') },
+    },
+    isAdjustmentAllowed: true,
+  },
+]);
 ```
 
 ## Key API Methods
 
-| Method | Purpose |
-|--------|---------|
-| `toMetaMaskSmartAccount()` | Create smart account instance |
-| `createDelegation()` | Build delegation with caveats |
-| `DelegationFramework.signDelegation()` | Sign delegation off-chain |
-| `DelegationFramework.redeemDelegationsCalldata()` | Build redemption calldata |
-| `DelegationFramework.disableDelegationCalldata()` | Build revocation calldata |
-| `deploySmartAccountsEnvironment()` | Deploy all framework contracts |
+| Method | Import | Purpose |
+|--------|--------|---------|
+| `toMetaMaskSmartAccount()` | `@metamask/smart-accounts-kit` | Create smart account instance |
+| `createDelegation()` | `@metamask/smart-accounts-kit` | Build delegation with scopes/caveats |
+| `createExecution()` | `@metamask/smart-accounts-kit` | Build execution struct for redemption |
+| `getSmartAccountsEnvironment()` | `@metamask/smart-accounts-kit` | Get contract addresses for a chain |
+| `DelegationManager.encode.redeemDelegations()` | `@metamask/smart-accounts-kit/contracts` | Build redemption calldata |
+| `DelegationManager.encode.disableDelegation()` | `@metamask/smart-accounts-kit/contracts` | Build revocation calldata |
+| `smartAccount.signDelegation()` | Smart account method | Sign delegation off-chain |
+| `erc7715ProviderActions()` | `@metamask/smart-accounts-kit/actions` | Wallet extension for ERC-7715 |
 
 ## Core Contract Addresses (Deterministic)
 
@@ -194,9 +221,9 @@ const grantedPermissions = await provider.request({
 |----------|---------|
 | DelegationManager | `0xdb9B1e94B5b69Df7e401DDbedE43491141047dB3` |
 | EntryPoint (v0.7) | `0x0000000071727De22E5E9d8BAf0edAc6f37da032` |
-| SimpleFactory | `0x6B36dE4e79f28e6252e268E4e1F45F489A0b0985` |
-| HybridDeleGator (impl) | `0x48B3fCD8d0E8e403C78fa7B39a3e7aAEff91E689` |
-| MultiSigDeleGator (impl) | `0x4cf028573e7050e3d5B7f98aF4eF7F61c22AfDF3` |
+| SimpleFactory | `0x69Aa2f9fe1572F1B640E1bbc512f5c3a734fc77c` |
+| HybridDeleGator (impl) | `0x48dBe696A4D990079e039489bA2053B36E8FFEC4` |
+| MultiSigDeleGator (impl) | `0x56a9EdB16a0105eb5a4C54f4C062e2868844f3A7` |
 
 > These are deterministic CREATE2 deployments. Verify on MegaETH before use. If missing, call `deploySmartAccountsEnvironment()`.
 
@@ -205,7 +232,7 @@ const grantedPermissions = await provider.request({
 | Issue | Solution |
 |-------|----------|
 | Account not deployed | First UserOp triggers deployment via initCode |
-| Gas estimation fails | Use remote `eth_estimateGas` — MegaEVM costs differ from standard EVM |
+| Gas estimation fails | Use remote `eth_estimateGas` — MegaEVM costs differ; 10M gas cap per call |
 | Delegation reverted | Check all caveat enforcer conditions are met |
 | Bundler rejects UserOp | Ensure EntryPoint v0.7 is deployed on MegaETH |
 | Passkey not working | WebAuthn requires HTTPS origin |

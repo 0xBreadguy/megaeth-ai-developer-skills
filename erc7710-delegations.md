@@ -67,70 +67,83 @@ All addresses are **deterministic deployments** — identical across every chain
 
 ## Delegation Lifecycle
 
-### 1. Create a delegation
+### 1. Get the environment
 
 ```typescript
-import {
-  createDelegation,
-  DelegationFramework,
-  SALT,
-} from '@metamask/smart-accounts-kit';
-import { parseUnits, encodePacked } from 'viem';
+import { getSmartAccountsEnvironment } from '@metamask/smart-accounts-kit';
+
+// Returns all contract addresses for the chain
+const environment = getSmartAccountsEnvironment(4326); // MegaETH mainnet
+```
+
+### 2. Create a delegation
+
+```typescript
+import { createDelegation } from '@metamask/smart-accounts-kit';
+import { parseUnits } from 'viem';
 
 // ERC-20 spending limit: 100 USDC
 const delegation = createDelegation({
-  delegator: smartAccount.address,
-  delegate: recipientAddress,
-  authority: SALT, // root delegation
+  from: smartAccount.address,
+  to: delegateAddress,
+  environment,
+  scope: {
+    type: 'erc20TransferAmount',
+    tokenAddress: USDC_ADDRESS,
+    maxAmount: parseUnits('100', 6),
+  },
   caveats: [
-    {
-      enforcer: '0xf100b0819427117EcF76Ed94B358B1A5b5C6D2Fc', // ERC20TransferAmountEnforcer
-      terms: encodePacked(
-        ['address', 'uint256'],
-        [USDC_ADDRESS, parseUnits('100', 6)]
-      ),
-    },
+    { type: 'timestamp', afterThreshold: now, beforeThreshold: expiry },
+    { type: 'limitedCalls', limit: 10 },
+    { type: 'redeemer', redeemers: [delegateAddress] },
   ],
 });
 ```
 
-### 2. Sign the delegation
+### 3. Sign the delegation
 
 ```typescript
-const signature = await DelegationFramework.signDelegation({
-  account: smartAccount,
-  delegation,
-  chainId: 4326,
-});
-
+// Via smart account method
+const signature = await smartAccount.signDelegation({ delegation });
 const signedDelegation = { ...delegation, signature };
 ```
 
-### 3. Redeem the delegation
+### 4. Redeem the delegation
 
 The delegate (or anyone allowed by RedeemerEnforcer) submits on-chain:
 
 ```typescript
-import { createPublicClient, http } from 'viem';
-import { megaeth } from './chain';
+import { DelegationManager } from '@metamask/smart-accounts-kit/contracts';
+import {
+  createExecution,
+  ExecutionMode,
+} from '@metamask/smart-accounts-kit';
+import { encodeFunctionData, erc20Abi } from 'viem';
 
-const client = createPublicClient({ chain: megaeth, transport: http() });
+const callData = encodeFunctionData({
+  abi: erc20Abi,
+  functionName: 'transfer',
+  args: [recipientAddress, parseUnits('50', 6)],
+});
 
-// Use eth_sendRawTransactionSync for instant redemption on MegaETH
-const txData = DelegationFramework.redeemDelegationsCalldata({
+const execution = createExecution({ target: USDC_ADDRESS, callData });
+
+const redeemCalldata = DelegationManager.encode.redeemDelegations({
   delegations: [[signedDelegation]],
-  modes: [0n], // CALL mode
-  executions: [
-    {
-      target: USDC_ADDRESS,
-      value: 0n,
-      callData: encodeFunctionData({
-        abi: erc20Abi,
-        functionName: 'transfer',
-        args: [recipientAddress, parseUnits('50', 6)],
-      }),
-    },
-  ],
+  modes: [ExecutionMode.SingleDefault],
+  executions: [[execution]],
+});
+
+// Via smart account + bundler
+const userOpHash = await bundlerClient.sendUserOperation({
+  account: delegateSmartAccount,
+  calls: [{ to: delegateSmartAccount.address, data: redeemCalldata }],
+});
+
+// Via EOA — use realtime_sendRawTransaction for instant receipt on MegaETH
+const txHash = await delegateWalletClient.sendTransaction({
+  to: environment.DelegationManager,
+  data: redeemCalldata,
 });
 ```
 
@@ -139,37 +152,38 @@ const txData = DelegationFramework.redeemDelegationsCalldata({
 ### Time-bound + spending limit
 
 ```typescript
-const caveats = [
-  {
-    enforcer: '0x1046bb45C8d673d4ea75321280DB34899413c069', // TimestampEnforcer
-    terms: encodePacked(
-      ['uint128', 'uint128'],
-      [BigInt(startTimestamp), BigInt(endTimestamp)]
-    ),
+const delegation = createDelegation({
+  from: delegator.address,
+  to: delegateAddress,
+  environment,
+  scope: {
+    type: 'erc20TransferAmount',
+    tokenAddress: TOKEN_ADDRESS,
+    maxAmount: parseUnits('1000', 18),
   },
-  {
-    enforcer: '0xf100b0819427117EcF76Ed94B358B1A5b5C6D2Fc', // ERC20TransferAmountEnforcer
-    terms: encodePacked(
-      ['address', 'uint256'],
-      [TOKEN_ADDRESS, parseUnits('1000', 18)]
-    ),
-  },
-];
+  caveats: [
+    { type: 'timestamp', afterThreshold: startTimestamp, beforeThreshold: endTimestamp },
+    { type: 'limitedCalls', limit: 50 },
+  ],
+});
 ```
 
 ### Function call scoping (specific methods on specific targets)
 
 ```typescript
-const caveats = [
-  {
-    enforcer: '0x7F20f61b1f09b08D970938F6fa563634d65c4EeB', // AllowedTargetsEnforcer
-    terms: encodePacked(['address'], [CONTRACT_ADDRESS]),
+const delegation = createDelegation({
+  from: delegator.address,
+  to: delegateAddress,
+  environment,
+  scope: {
+    type: 'functionCall',
+    targets: [CONTRACT_ADDRESS],
+    selectors: ['swap(address,uint256)'],
   },
-  {
-    enforcer: '0x2c21fD0Cb9DC8445CB3fb0DC5E7Bb0Aca01842B5', // AllowedMethodsEnforcer
-    terms: encodePacked(['bytes4'], [functionSelector]),
-  },
-];
+  caveats: [
+    { type: 'allowedMethods', selectors: ['swap(address,uint256)'] },
+  ],
+});
 ```
 
 ### Redelegation chains
@@ -178,30 +192,44 @@ A delegate can redelegate their authority (with equal or narrower caveats):
 
 ```typescript
 const redelegation = createDelegation({
-  delegator: delegate1Address,
-  delegate: delegate2Address,
-  authority: originalDelegationHash, // chain to parent
-  caveats: [/* must be equal or more restrictive */],
+  from: delegate1Address,
+  to: delegate2Address,
+  environment,
+  parentDelegation: originalDelegation,
+  scope: {
+    type: 'erc20TransferAmount',
+    tokenAddress: TOKEN_ADDRESS,
+    maxAmount: parseUnits('50', 6), // narrower than parent
+  },
+  caveats: [
+    { type: 'timestamp', afterThreshold: now, beforeThreshold: expiry },
+  ],
 });
 ```
 
 When redeeming, pass the full chain: `delegations: [[redelegation, originalDelegation]]`.
 
-### Native token allowance (recurring)
+### Periodic native token allowance
 
 ```typescript
-{
-  enforcer: '0x9BC0FAf4Aca5AE429F4c06aEEaC517520CB16BD9', // NativeTokenPeriodTransferEnforcer
-  terms: encodePacked(
-    ['uint256', 'uint256'],
-    [parseUnits('1', 18), BigInt(86400)] // 1 ETH per day
-  ),
-}
+const delegation = createDelegation({
+  from: delegator.address,
+  to: delegateAddress,
+  environment,
+  scope: {
+    type: 'nativeTokenPeriodTransfer',
+    periodAmount: parseEther('1'),
+    periodDuration: 86400, // 1 ETH per day
+    startDate: now,
+  },
+});
 ```
 
 ## MegaETH Advantage
 
-Use `eth_sendRawTransactionSync` for instant delegation redemption — get the receipt in <10ms instead of polling. This is critical for real-time delegation flows (AI agents, automated trading, session keys).
+Use `realtime_sendRawTransaction` for instant delegation redemption — get the receipt in <10ms instead of polling. This is critical for real-time delegation flows (AI agents, automated trading, session keys).
+
+> **Note:** MegaETH caps `eth_call` and `eth_estimateGas` at 10M gas per call. Heavy delegation operations (large caveat chains) should account for this limit.
 
 ## Safe Multisig Integration
 
@@ -210,9 +238,8 @@ Smart accounts created via `Implementation.MultiSig` use a DeleGator-compatible 
 ## Revocation
 
 ```typescript
-// Revoke a specific delegation
-const tx = DelegationFramework.disableDelegationCalldata(delegation);
+import { DelegationManager } from '@metamask/smart-accounts-kit/contracts';
 
-// Revoke all delegations (nuclear option)
-const tx = DelegationFramework.disableAllDelegationsCalldata();
+// Revoke a specific delegation
+const tx = DelegationManager.encode.disableDelegation({ delegation });
 ```
