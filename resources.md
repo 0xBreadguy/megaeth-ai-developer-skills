@@ -216,6 +216,15 @@ Consider runtime monitoring for:
 - **Discord**: (contact MegaETH team)
 - **Twitter**: @megaeth_labs
 
+## Delegation Framework & Smart Accounts
+
+- **MetaMask Smart Accounts Kit**: https://www.npmjs.com/package/@metamask/smart-accounts-kit
+- **Smart Accounts Kit docs**: https://docs.metamask.io/smart-accounts-kit
+- **Delegation Framework contracts**: https://github.com/MetaMask/delegation-framework
+- **ERC-7710 standard**: https://eips.ethereum.org/EIPS/eip-7710
+- **ERC-7715 standard**: https://eips.ethereum.org/EIPS/eip-7715
+- **ERC-4337 standard**: https://eips.ethereum.org/EIPS/eip-4337
+
 ## Quick Reference
 
 ```bash

@@ -46,6 +46,8 @@ clawdhub install megaeth-developer
 ├── gas-model.md              # Gas costs, estimation, base fee
 ├── testing.md                # mega-evme, Foundry, debugging
 ├── security.md               # Vulnerabilities and prevention
+├── erc7710-delegations.md    # ERC-7710 delegation framework, caveats, permissions
+├── smart-accounts.md         # MetaMask Smart Accounts Kit, signers, user operations
 └── resources.md              # Links, tools, explorers, bridges, DEX
 ```
 
@@ -73,6 +75,10 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 "How do I subscribe to real-time mini-blocks?"
 "Optimize this contract for MegaETH storage costs"
 "Debug this failed transaction on MegaETH"
+"Set up ERC-7710 delegations and scoped permissions"
+"Create a MetaMask Smart Account on MegaETH"
+"Set up spending limits and time-bound permissions"
+"Implement redelegation chains"
 ```
 
 ## Key Concepts

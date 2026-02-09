@@ -1,6 +1,6 @@
 ---
 name: megaeth-developer
-description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, and debugging with mega-evme. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, or integrating Privy embedded wallets.
+description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, and debugging with mega-evme. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, or integrating Privy embedded wallets, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management.
 ---
 
 # MegaETH Development Skill
@@ -23,6 +23,9 @@ Use this Skill when the user asks for:
 - Bridging ETH from Ethereum to MegaETH
 - Privy integration for headless/automated signing
 - Ultra-low latency transaction patterns
+- ERC-7710 delegations (scoped permissions, spending limits, redelegation chains)
+- MetaMask Smart Accounts (ERC-4337 accounts, signers, user operations)
+- Advanced permissions (ERC-7715) via MetaMask
 
 ## Chain Configuration
 
@@ -79,6 +82,7 @@ Use this Skill when the user asks for:
 - Transactions: sign locally → `eth_sendRawTransactionSync` → done
 - Contracts: check SSTORE patterns, avoid volatile data access limits
 - Testing: use mega-evme for replay, Foundry with `--skip-simulation`
+- Delegations: create scoped permissions → sign → share → redeem via `eth_sendRawTransactionSync`
 
 ### 3. Implement with MegaETH-specific correctness
 Always be explicit about:
@@ -106,4 +110,6 @@ When implementing changes, provide:
 - Gas model: [gas-model.md](gas-model.md)
 - Testing & debugging: [testing.md](testing.md)
 - Security considerations: [security.md](security.md)
+- ERC-7710 delegations: [erc7710-delegations.md](erc7710-delegations.md)
+- MetaMask Smart Accounts: [smart-accounts.md](smart-accounts.md)
 - Reference links & attribution: [resources.md](resources.md)
