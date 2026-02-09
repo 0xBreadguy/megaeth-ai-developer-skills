@@ -137,7 +137,7 @@ const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
 
 ## EOA-Based Delegation Redemption
 
-For EOA signers, bypass the bundler entirely. On MegaETH, use `realtime_sendRawTransaction` for instant receipts:
+For EOA signers, bypass the bundler entirely. On MegaETH, use `eth_sendRawTransactionSync` for instant receipts:
 
 ```typescript
 import { createWalletClient } from 'viem';

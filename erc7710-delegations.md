@@ -140,7 +140,7 @@ const userOpHash = await bundlerClient.sendUserOperation({
   calls: [{ to: delegateSmartAccount.address, data: redeemCalldata }],
 });
 
-// Via EOA — use realtime_sendRawTransaction for instant receipt on MegaETH
+// Via EOA — use eth_sendRawTransactionSync for instant receipt on MegaETH
 const txHash = await delegateWalletClient.sendTransaction({
   to: environment.DelegationManager,
   data: redeemCalldata,
@@ -227,7 +227,7 @@ const delegation = createDelegation({
 
 ## MegaETH Advantage
 
-Use `realtime_sendRawTransaction` for instant delegation redemption — get the receipt in <10ms instead of polling. This is critical for real-time delegation flows (AI agents, automated trading, session keys).
+Use `eth_sendRawTransactionSync` for instant delegation redemption — get the receipt in <10ms instead of polling. This is critical for real-time delegation flows (AI agents, automated trading, session keys).
 
 > **Note:** MegaETH caps `eth_call` and `eth_estimateGas` at 10M gas per call. Heavy delegation operations (large caveat chains) should account for this limit.
 
