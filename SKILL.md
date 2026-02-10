@@ -1,6 +1,6 @@
 ---
 name: megaeth-developer
-description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, and debugging with mega-evme. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, or integrating Privy embedded wallets, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management.
+description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, debugging with mega-evme, and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, or hosting websites on-chain with Warren.
 ---
 
 # MegaETH Development Skill
@@ -112,4 +112,5 @@ When implementing changes, provide:
 - Security considerations: [security.md](security.md)
 - ERC-7710 delegations: [erc7710-delegations.md](erc7710-delegations.md)
 - MetaMask Smart Accounts: [smart-accounts.md](smart-accounts.md)
+- Warren Protocol (on-chain websites): [warren.md](warren.md)
 - Reference links & attribution: [resources.md](resources.md)
