@@ -386,10 +386,95 @@ MegaETH uses OP Stack. Standard bridge contracts and predeploys are available:
 
 See OP Stack docs for full predeploy list.
 
+## On-Chain SVG / Metadata Generation
+
+MegaETH's 512KB contract size limit makes on-chain SVG generation practical. Key patterns:
+
+### Stack Depth Management
+
+SVG generation hits stack-too-deep easily. Each `internal pure` function gets its own stack frame:
+
+```solidity
+// ❌ One big function — stack-too-deep
+function generateSVG() internal pure returns (string memory) {
+    string memory bg = ...;
+    string memory border = ...;
+    string memory name = ...;
+    string memory info = ...;  // Stack overflow
+    return string.concat(bg, border, name, info);
+}
+
+// ✅ Split into small functions — each gets its own stack
+function _svg() internal pure returns (string memory) {
+    string memory part1 = string.concat(_svgOpen(), _svgBg());
+    string memory part2 = _svgCorners();
+    string memory part3 = string.concat(_svgName(), _svgInfo(), _svgClose());
+    return string.concat(part1, part2, part3);
+}
+
+function _svgBg() internal pure returns (string memory) { ... }
+function _svgCorners() internal pure returns (string memory) { ... }
+function _svgName() internal pure returns (string memory) { ... }
+```
+
+### Parameter Packing
+
+When you need to pass many values between functions, pack into fixed-size arrays:
+
+```solidity
+// ❌ Too many params — stack overflow
+function _render(string memory a, uint256 b, uint64 c, bool d, string memory e, uint8 f) ...
+
+// ✅ Pack into array
+function _render(uint256[6] memory params) internal pure returns (string memory) { ... }
+```
+
+### Upgradeable Renderer Pattern
+
+Instead of proxy patterns, use a swappable external renderer for NFT metadata:
+
+```solidity
+address public tokenURIRenderer;
+
+function tokenURI(uint256 tokenId) public view override returns (string memory) {
+    if (tokenURIRenderer != address(0)) {
+        return ITokenURIRenderer(tokenURIRenderer).tokenURI(tokenId);
+    }
+    return _defaultTokenURI(tokenId); // Built-in fallback
+}
+
+function setTokenURIRenderer(address renderer) external onlyOwner {
+    tokenURIRenderer = renderer;
+}
+```
+
+This lets you iterate NFT visuals by deploying new renderer contracts without touching the main contract. Keep renderers **stateless** (read from the main contract) so redeployment needs zero migration.
+
+## Etherscan V2 API (Contract Verification)
+
+MegaETH uses the Etherscan V2 API with chain ID parameter:
+
+```bash
+# V2 endpoint (preferred)
+https://api.etherscan.io/v2/api?chainid=4326
+
+# Verify contract
+forge verify-contract <address> src/MyContract.sol:MyContract \
+  --chain 4326 \
+  --etherscan-api-key $ETHERSCAN_KEY \
+  --verifier-url "https://api.etherscan.io/v2/api?chainid=4326"
+
+# Explorer
+https://mega.etherscan.io
+```
+
 ## Common Issues
 
 ### "Intrinsic gas too low"
-Local simulation uses wrong opcode costs. Use `--skip-simulation` or remote estimation.
+Local simulation uses wrong opcode costs. Use `--skip-simulation` or remote estimation. For large contracts (25KB+ bytecode), use `--gas-limit 500000000` (500M).
+
+### `via_ir` silently breaks return values
+**Never use `via_ir=true`** in foundry.toml. It can cause functions to return 0 instead of correct values with no compiler error. Use `optimizer=true` with `optimizer_runs=200` instead.
 
 ### "Out of gas" after block.timestamp
 Hitting volatile data access limit. Restructure to access metadata late.
