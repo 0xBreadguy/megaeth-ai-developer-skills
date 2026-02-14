@@ -9,6 +9,9 @@ MegaNames is the ENS-style naming service for MegaETH's `.mega` TLD with stable 
 | Contract | Address |
 |----------|---------|
 | MegaNames | `0x5B424C6CCba77b32b9625a6fd5A30D409d20d997` |
+| MegaNameRenderer | `0x8d206c277E709c8F4f8882fc0157bE76dA0C48C4` |
+| SubdomainRouter | `0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe` |
+| SubdomainLogic | `0xf09fB5cB77b570A30D68b1Aa1d944256171C5172` |
 | USDM | `0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7` |
 | Fee Recipient | `0x25925C0191E8195aFb9dFA35Cd04071FF11D2e38` |
 
@@ -173,6 +176,10 @@ uint256 subId = megaNames.registerSubdomain(parentTokenId, "blog");
 
 // Parent owner can revoke subdomains
 megaNames.revokeSubdomain(subdomainTokenId);
+
+// Nested subdomains supported (up to 10 levels deep)
+// e.g., vault.bread.mega → 1.vault.bread.mega
+uint256 nestedSubId = megaNames.registerSubdomain(subId, "1");
 ```
 
 ### Subdomain Token ID
@@ -181,6 +188,113 @@ megaNames.revokeSubdomain(subdomainTokenId);
 // Subdomain tokenId uses parent tokenId as node (not MEGA_NODE)
 uint256 subTokenId = uint256(keccak256(abi.encodePacked(bytes32(parentTokenId), keccak256(bytes(subLabel)))));
 ```
+
+## Subdomain Marketplace
+
+Name owners can sell subdomains through the SubdomainRouter. Buyers pay USDM; 97.5% goes to the name owner, 2.5% protocol fee.
+
+### Contract Addresses
+
+| Contract | Address |
+|----------|---------|
+| SubdomainRouter | `0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe` |
+| SubdomainLogic | `0xf09fB5cB77b570A30D68b1Aa1d944256171C5172` |
+
+### Selling Subdomains (Name Owner)
+
+```solidity
+// 1. Approve router to transfer your NFT (one-time)
+megaNames.setApprovalForAll(0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe, true);
+
+// 2. Set price (in USDM, 18 decimals)
+ISubdomainLogic(0xf09fB5cB77b570A30D68b1Aa1d944256171C5172).setPrice(
+    parentTokenId,
+    0.01 ether // $0.01 USDM minimum
+);
+
+// 3. Enable sales
+ISubdomainRouter(0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe).configure(
+    parentTokenId,
+    payoutAddress, // where you receive payments
+    true,          // enabled
+    0              // mode: 0=open, 1=allowlist (token-gated)
+);
+
+// Disable sales
+ISubdomainRouter(0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe).disable(parentTokenId);
+```
+
+### Token Gating (Optional)
+
+```solidity
+// Require buyers to hold a specific NFT/token
+ISubdomainLogic(0xf09fB5cB77b570A30D68b1Aa1d944256171C5172).setTokenGate(
+    parentTokenId,
+    tokenContractAddress, // ERC-20 or ERC-721
+    1                     // minimum balance required
+);
+
+// Use mode=1 when configuring to enable the gate
+router.configure(parentTokenId, payoutAddress, true, 1);
+```
+
+### Buying a Subdomain
+
+```solidity
+// 1. Approve USDM for SubdomainRouter
+IERC20(USDM).approve(0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe, price);
+
+// 2. Get quote (checks eligibility + price)
+(bool allowed, uint256 price, uint256 protocolFee, uint256 total) =
+    ISubdomainRouter(0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe).quote(
+        parentTokenId,
+        "sublabel",
+        buyerAddress
+    );
+
+// 3. Register (referrer=address(0) if none)
+uint256 subTokenId = ISubdomainRouter(0xdB5e5Ab907e62714D7d9Ffde209A4E770a0507Fe).register(
+    parentTokenId,
+    "sublabel",
+    address(0) // referrer
+);
+```
+
+### Batch Registration
+
+```solidity
+// Register multiple subdomains in one tx (max 50)
+string[] memory labels = new string[](3);
+labels[0] = "alpha";
+labels[1] = "beta";
+labels[2] = "gamma";
+
+uint256[] memory tokenIds = router.registerBatch(parentTokenId, labels, address(0));
+```
+
+### Reading Marketplace State
+
+```solidity
+// Check if a parent has sales enabled
+(address payoutAddress, bool enabled, uint8 mode) = router.getConfig(parentTokenId);
+
+// Get price
+uint256 price = ISubdomainLogic(logic).prices(parentTokenId);
+
+// Get sales counters
+(uint64 sold, uint64 active, uint128 volumeUsdm6) = router.getCounters(parentTokenId);
+
+// Get token gate info
+(address token, uint256 minBalance) = ISubdomainLogic(logic).tokenGates(parentTokenId);
+```
+
+### Key Design Notes
+
+- **Flash-based** — parent NFT is temporarily pulled, subdomain registered, parent returned — all atomic
+- **No escrow** — USDM transfers directly from buyer to owner + protocol fee recipient
+- **Transient storage** (EIP-1153) for reentrancy guard — zero gas vs 2M+ SSTORE on MegaETH
+- **Swappable logic** — router is permanent, logic contract can be upgraded without losing config
+- **Minimum price** — $0.01 USDM enforced by router (not bypassable by logic)
 
 ## Warren Contenthash (On-Chain Websites)
 
@@ -278,6 +392,25 @@ const { data: tokenIds } = useReadContract({
 })
 ```
 
+## Upgradeable TokenURI Renderer
+
+The contract supports an external renderer for NFT metadata/SVG:
+
+```solidity
+// Owner can swap renderer without proxy patterns
+megaNames.setTokenURIRenderer(newRendererAddress);
+
+// Current renderer
+address renderer = megaNames.tokenURIRenderer();
+// Returns address(0) if using built-in fallback SVG
+```
+
+The current renderer (`0x8d206c277E709c8F4f8882fc0157bE76dA0C48C4`) is fully stateless — it reads only from the MegaNames contract. Features:
+- `.m` SVG path logo
+- 5 rarity tiers based on root parent domain length (1-char=Legendary through 5+=Standard)
+- Subdomain split display (sub chain top line, root parent below)
+- Expiry dates, character count, tier-colored backgrounds
+
 ## Key Design Notes
 
 - **No commit-reveal** — MegaETH is fast enough; registration is direct approve + register
@@ -285,4 +418,8 @@ const { data: tokenIds } = useReadContract({
 - **100% of fees** go to fee recipient address
 - **Names are ERC-721** — fully transferable, tradeable on NFT marketplaces
 - **Subdomains are revocable** by parent owner; parent name transfers are irreversible
+- **Nested subdomains** up to 10 levels deep; tier inherits from root parent domain
+- **Upgradeable renderer** — owner can swap NFT metadata renderer without proxy patterns
 - **Registration can be gated** — `registrationOpen` flag controlled by contract owner
+- **Subdomain marketplace** — name owners sell subdomains via SubdomainRouter; flash-based atomic registration
+- **Token gating** — restrict subdomain purchases to holders of specific NFT/token contracts
