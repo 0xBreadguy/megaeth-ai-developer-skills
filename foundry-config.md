@@ -172,6 +172,43 @@ forge lint --severity high --severity medium
 
 > Source: `forge lint` added in Foundry v1.0, from [Foundry docs](https://getfoundry.sh/forge/linting).
 
+## ⚠️ Critical: Never Use `via_ir`
+
+`via_ir=true` can **silently break function return values** — functions may return 0 instead of the correct value with no compiler error and no test failure on simple cases. This has been confirmed multiple times on MegaETH contracts.
+
+```toml
+# ❌ NEVER — can silently corrupt return values
+# via_ir = true
+
+# ✅ Safe default
+optimizer = true
+optimizer_runs = 200
+```
+
+## Large Contract Deployment (500M Gas)
+
+Contracts with 25KB+ bytecode need **500M gas limit** on MegaETH, not 5M. The `forge script` examples above use 5M which works for small contracts but will fail with "intrinsic gas too low" for real-sized contracts.
+
+```bash
+# For large contracts, use cast send directly (more reliable than forge script)
+BYTECODE=$(forge inspect MyContract bytecode)
+ARGS=$(cast abi-encode "constructor(address)" 0x1234...)
+
+cast send --rpc-url https://mainnet.megaeth.com/rpc \
+  --private-key $PK \
+  --gas-limit 500000000 \
+  --create "0x${BYTECODE#0x}${ARGS#0x}"
+```
+
+### Why `cast send --create` over `forge script`?
+
+`forge script --broadcast` has known issues on MegaETH:
+- `--rpc-url` / `-r` flags are sometimes ignored (use `--fork-url` or `ETH_RPC_URL` env var)
+- Gas estimation produces values too low for large bytecode
+- `--gas-limit` flag on forge script applies to simulation, not always to broadcast
+
+`cast send --create` with explicit gas limit is the most reliable deployment method.
+
 ## Environment Setup
 
 ```bash

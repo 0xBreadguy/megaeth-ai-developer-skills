@@ -172,6 +172,39 @@ const monitor = new TransactionMonitor({
 });
 ```
 
+## Input Validation: Allowlist Over Blocklist
+
+Always validate user inputs with strict allowlists, never blocklists:
+
+```solidity
+// ❌ Blocklist — misses null bytes, emoji, control chars, <script>, etc.
+function validate(string memory input) internal pure {
+    // Only blocks dots
+    require(!containsDot(input), "No dots");
+    // Everything else passes — including malicious inputs
+}
+
+// ✅ Allowlist — only permits known-safe characters
+function validate(string memory label) internal pure returns (string memory) {
+    bytes memory b = bytes(label);
+    require(b.length > 0 && b.length <= 255, "Invalid length");
+    require(b[0] != 0x2d && b[b.length - 1] != 0x2d, "No leading/trailing hyphens");
+    
+    for (uint256 i; i < b.length; i++) {
+        bytes1 c = b[i];
+        require(
+            (c >= 0x61 && c <= 0x7a) || // a-z
+            (c >= 0x30 && c <= 0x39) || // 0-9
+            c == 0x2d,                   // hyphen
+            "Invalid character"
+        );
+    }
+    return label;
+}
+```
+
+**Lesson:** A blocklist approach once let null bytes, spaces, `<script>` tags, emoji, and control characters through validation. 43 functional tests all passed but missed these cases. Always test inputs adversarially.
+
 ## Resources
 
 - **MegaEVM Spec**: https://github.com/megaeth-labs/mega-evm/blob/main/specs/MiniRex.md

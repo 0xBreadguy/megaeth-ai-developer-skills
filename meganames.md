@@ -8,13 +8,14 @@ MegaNames is the ENS-style naming service for MegaETH's `.mega` TLD with stable 
 
 | Contract | Address |
 |----------|---------|
-| MegaNames | `0x0dbB1582ea7eA2584bFDE68AbA5d46763A568491` |
+| MegaNames | `0x5B424C6CCba77b32b9625a6fd5A30D409d20d997` |
+| MegaNameRenderer | `0x8d206c277E709c8F4f8882fc0157bE76dA0C48C4` |
 | USDM | `0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7` |
 | Fee Recipient | `0x25925C0191E8195aFb9dFA35Cd04071FF11D2e38` |
 
 **Explorers:**
-- Blockscout: https://megaeth.blockscout.com/address/0x0dbB1582ea7eA2584bFDE68AbA5d46763A568491
-- Etherscan: https://mega.etherscan.io/address/0x0dbB1582ea7eA2584bFDE68AbA5d46763A568491
+- Blockscout: https://megaeth.blockscout.com/address/0x5B424C6CCba77b32b9625a6fd5A30D409d20d997
+- Etherscan: https://mega.etherscan.io/address/0x5B424C6CCba77b32b9625a6fd5A30D409d20d997
 
 **Frontend:** https://meganame.market
 
@@ -71,7 +72,7 @@ Names are ERC-721 NFTs. Registration requires USDM approval + register call.
 ```solidity
 // 1. Approve USDM
 IERC20(0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7).approve(
-    0x0dbB1582ea7eA2584bFDE68AbA5d46763A568491,
+    0x5B424C6CCba77b32b9625a6fd5A30D409d20d997,
     fee
 );
 
@@ -173,6 +174,10 @@ uint256 subId = megaNames.registerSubdomain(parentTokenId, "blog");
 
 // Parent owner can revoke subdomains
 megaNames.revokeSubdomain(subdomainTokenId);
+
+// Nested subdomains supported (up to 10 levels deep)
+// e.g., vault.bread.mega → 1.vault.bread.mega
+uint256 nestedSubId = megaNames.registerSubdomain(subId, "1");
 ```
 
 ### Subdomain Token ID
@@ -251,7 +256,7 @@ Invalid: `-name`, `name-`, `My.Name`, `name space`, `émoji`
 ```typescript
 import { useReadContract } from 'wagmi'
 
-const MEGA_NAMES = '0x0dbB1582ea7eA2584bFDE68AbA5d46763A568491'
+const MEGA_NAMES = '0x5B424C6CCba77b32b9625a6fd5A30D409d20d997'
 
 // Resolve name to address
 const { data: addr } = useReadContract({
@@ -278,6 +283,25 @@ const { data: tokenIds } = useReadContract({
 })
 ```
 
+## Upgradeable TokenURI Renderer
+
+The contract supports an external renderer for NFT metadata/SVG:
+
+```solidity
+// Owner can swap renderer without proxy patterns
+megaNames.setTokenURIRenderer(newRendererAddress);
+
+// Current renderer
+address renderer = megaNames.tokenURIRenderer();
+// Returns address(0) if using built-in fallback SVG
+```
+
+The current renderer (`0x8d206c277E709c8F4f8882fc0157bE76dA0C48C4`) is fully stateless — it reads only from the MegaNames contract. Features:
+- `.m` SVG path logo
+- 5 rarity tiers based on root parent domain length (1-char=Legendary through 5+=Standard)
+- Subdomain split display (sub chain top line, root parent below)
+- Expiry dates, character count, tier-colored backgrounds
+
 ## Key Design Notes
 
 - **No commit-reveal** — MegaETH is fast enough; registration is direct approve + register
@@ -285,4 +309,6 @@ const { data: tokenIds } = useReadContract({
 - **100% of fees** go to fee recipient address
 - **Names are ERC-721** — fully transferable, tradeable on NFT marketplaces
 - **Subdomains are revocable** by parent owner; parent name transfers are irreversible
+- **Nested subdomains** up to 10 levels deep; tier inherits from root parent domain
+- **Upgradeable renderer** — owner can swap NFT metadata renderer without proxy patterns
 - **Registration can be gated** — `registrationOpen` flag controlled by contract owner
