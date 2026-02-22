@@ -70,7 +70,7 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 ```
 "Set up a wallet for MegaETH"
 "Send 0.1 ETH on MegaETH"
-"Swap USDC for ETH on MegaETH"
+"Swap USDM for ETH on MegaETH"
 "Bridge ETH from Ethereum to MegaETH"
 "Set up a Next.js app with MegaETH wallet connection"
 "Deploy a contract to MegaETH with Foundry"
