@@ -17,33 +17,47 @@ MegaEVM is fully compatible with Ethereum contracts but has different:
 
 ## Volatile Data Access Control
 
-After accessing block metadata, transaction is limited to 20M additional compute gas.
+Accessing block metadata caps the **total** compute gas for the entire transaction to 20M. This cap is **retroactive** — it applies to all compute gas used in the transaction, not just gas consumed after the volatile opcode. If the transaction has already burned more than 20M compute gas before touching `block.timestamp`, it immediately reverts with OOG.
 
 **Affected opcodes:**
-- `TIMESTAMP` / `block.timestamp`
-- `NUMBER` / `block.number`
-- `BLOCKHASH` / `blockhash(n)`
+- `TIMESTAMP`, `NUMBER`, `BLOCKHASH`, `BASEFEE`, `PREVRANDAO`, `GASLIMIT`, `COINBASE`, `BLOBBASEFEE`, `BLOBHASH`
+- Any access to the beneficiary account (`BALANCE`, `EXTCODESIZE`, `EXTCODEHASH` on coinbase address)
+- Oracle contract SLOAD (also 20M cap since Rex3; was 1M pre-Rex3)
 
 ```solidity
-// ❌ Problematic pattern
+// ❌ Front-loading does NOT help — cap is retroactive
 function process() external {
-    uint256 ts = block.timestamp;  // Triggers limit
-    // Complex computation here will hit 20M gas ceiling
     for (uint i = 0; i < 10000; i++) {
-        // Heavy work...
+        // Burns >20M compute gas...
+    }
+    uint256 ts = block.timestamp;  // Immediately OOGs — total already exceeds 20M
+}
+
+// ❌ Also fails — same reason
+function process() external {
+    uint256 ts = block.timestamp;  // Sets 20M total cap
+    for (uint i = 0; i < 10000; i++) {
+        // Will OOG once cumulative compute gas exceeds 20M
     }
 }
 
-// ✅ Better: access metadata late
+// ✅ Keep total compute gas under 20M when using block metadata
 function process() external {
-    // Do heavy computation first
-    for (uint i = 0; i < 10000; i++) {
-        // Heavy work...
-    }
-    // Access metadata at the end
-    emit Processed(block.timestamp);
+    uint256 ts = block.timestamp;
+    // Light computation only — stay under 20M total
+    lastUpdated = ts;
+    emit Processed(ts);
+}
+
+// ✅ For high-precision time without the cap, use the timestamp oracle
+function process() external {
+    uint256 microTs = ITimestampOracle(ORACLE).readTimestamp();
+    // Oracle SLOAD has its own 20M cap (Rex3), but separate from block env
+    // Heavy computation is fine if you don't also touch block.timestamp
 }
 ```
+
+**Key insight:** If your contract needs both heavy computation AND time-awareness, split them into separate transactions or use the timestamp oracle.
 
 **Spec:** https://github.com/megaeth-labs/mega-evm/blob/main/specs/MiniRex.md#28-volatile-data-access-control
 

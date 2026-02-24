@@ -106,21 +106,30 @@ forge script Deploy.s.sol --gas-limit 5000000 --skip-simulation
 
 ## Volatile Data Access Limit
 
-After accessing block metadata, tx is limited to 20M additional compute gas:
+Accessing block metadata caps the **total** compute gas for the entire transaction to 20M — retroactively. This is not a budget for remaining work; it's an absolute ceiling. If the transaction has already used more than 20M compute gas before the volatile opcode, it immediately reverts with OOG.
 
 ```solidity
-// Operations that trigger the limit:
-block.timestamp
-block.number
-blockhash(n)
+// Operations that trigger the 20M total compute gas cap:
+block.timestamp   // TIMESTAMP
+block.number      // NUMBER
+blockhash(n)      // BLOCKHASH
+block.basefee     // BASEFEE
+block.prevrandao  // PREVRANDAO
+block.gaslimit    // GASLIMIT
+block.coinbase    // COINBASE
+// Also: BLOBBASEFEE, BLOBHASH
+// Also: any access to the beneficiary account (BALANCE, EXTCODESIZE, etc.)
 
-// After any of these, only 20M gas remaining for:
-// - Complex computations
-// - Multiple external calls
-// - Large loops
+// Oracle contract SLOAD: also 20M cap (raised from 1M in Rex3)
 ```
 
-**Workaround:** Access block metadata late in execution, or use the high-precision timestamp oracle which has separate accounting.
+**Key rules:**
+- The cap is **retroactive** — it limits total compute gas, not just what's left
+- Front-loading heavy computation before `block.timestamp` does NOT help
+- If multiple volatile types are accessed, the most restrictive cap wins
+- Oracle SLOAD triggers a separate 20M cap (Rex3+); pre-Rex3 was 1M
+
+**Workaround:** Keep total compute gas under 20M in any transaction that touches block metadata, or use the high-precision timestamp oracle which has separate accounting.
 
 ## Fee History
 

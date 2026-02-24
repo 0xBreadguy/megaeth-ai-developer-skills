@@ -106,9 +106,9 @@ setInterval(() => {
 
 Error after using `block.timestamp` + heavy computation.
 
-**Cause:** 20M gas limit after accessing block metadata.
+**Cause:** 20M **total** compute gas cap (retroactive) when any block metadata opcode is accessed. The cap applies to the entire transaction's compute gas, not just gas used after the opcode.
 
-**Fix:** Restructure contract to access metadata late, or use oracle.
+**Fix:** Keep total compute gas under 20M in transactions that touch block metadata. For heavy computation + time-awareness, split into separate transactions or use the timestamp oracle.
 
 ## Cast Commands
 

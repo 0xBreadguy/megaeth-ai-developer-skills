@@ -144,7 +144,7 @@ async function submitWithRetry(tx: Transaction, maxRetries = 3) {
 1. **Use mega-evme** for transaction replay and gas profiling
 2. **Test with realistic gas costs** — fork testnet, don't simulate locally
 3. **Review SSTORE patterns** — each new slot is expensive
-4. **Check volatile data usage** — 20M gas limit after block metadata access
+4. **Check volatile data usage** — 20M total compute gas cap (retroactive) when block metadata is accessed
 5. **Verify CPI targets** — don't allow arbitrary external calls
 
 ## Security Review Questions
