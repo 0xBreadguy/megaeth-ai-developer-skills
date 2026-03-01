@@ -24,14 +24,53 @@ Both are paid from your gas limit, but tracked separately for resource accountin
 
 ## Per-Transaction Resource Limits (Rex)
 
-| Resource | Limit |
-|----------|-------|
-| Compute gas | 200M |
-| KV updates | 500K |
-| State growth slots | 1,000 |
-| Data size | 12.5 MB |
-| Contract code | 512 KB |
-| Calldata | 128 KB |
+| Resource | TX Limit | Block Limit |
+|----------|----------|-------------|
+| Compute gas | 200M | per block |
+| KV updates | 500K | per block |
+| State growth slots | 1,000 | 1,000 |
+| Data size | 12.5 MB | per block |
+| Contract code | 512 KB | — |
+| Calldata | 128 KB | — |
+
+**Block limit overflow rule:** For post-execution limits (compute gas, data size, KV updates, state growth), the last transaction that causes the block to exceed the limit is **still included**. This maximizes block utilization — the block builder can't know actual usage until after execution. Subsequent transactions are skipped to the next block.
+
+### Per-Frame State Growth (Rex4)
+
+Rex4 adds per-frame state growth budgets. Each inner call frame gets at most 98% of the parent's remaining state growth budget, preventing a single inner call from consuming the entire tx's 1,000 slot limit.
+
+```
+Top-level: 1000 slots
+  → Child A: 1000 * 98/100 = 980 slots
+    → Grandchild B: (980 - used) * 98/100
+```
+
+If a child frame exceeds its budget, it **reverts** (not halts) — the parent can catch it and continue. The revert data is `MegaLimitExceeded(uint8 kind, uint64 limit)` where kind=3 for state growth.
+
+### MegaAccessControl (Rex4)
+
+System contract at `0x6342000000000000000000000000000000000004` lets contracts opt out of volatile data access:
+
+```solidity
+import {IMegaAccessControl} from "./interfaces/IMegaAccessControl.sol";
+
+IMegaAccessControl access = IMegaAccessControl(0x6342000000000000000000000000000000000004);
+
+// Disable volatile data in this frame + all inner calls
+access.disableVolatileDataAccess();
+
+// Call untrusted code — if it touches block.timestamp, it reverts
+// instead of triggering the 20M compute gas cap
+(bool ok, ) = untrusted.call(data);
+
+// Re-enable
+access.enableVolatileDataAccess();
+```
+
+Key rules:
+- Scoped to caller's subtree — sibling calls after the frame returns are unaffected
+- Children cannot override parent restrictions (`DisabledByParent()` revert)
+- Blocked accesses do NOT trigger gas detention — the access is rejected before affecting tracking
 
 ## Setting Gas Price
 

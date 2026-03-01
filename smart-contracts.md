@@ -9,11 +9,29 @@ MegaEVM is fully compatible with Ethereum contracts but has different:
 
 ## Contract Limits
 
-| Resource | Limit |
-|----------|-------|
-| Contract code | 512 KB |
-| Calldata | 128 KB |
-| eth_call/estimateGas | 10M gas (public), higher on VIP |
+| Resource | TX Limit | Block Limit |
+|----------|----------|-------------|
+| Contract code | 512 KB | — |
+| Calldata | 128 KB | — |
+| State growth | 1,000 slots | 1,000 slots |
+| eth_call/estimateGas | 10M gas (public) | higher on VIP |
+
+**Note:** The last tx in a block can push state growth past 1,000 — post-execution limits allow the exceeding tx to be included, then the block closes.
+
+### Per-Frame State Growth (Rex4)
+
+Inner call frames receive 98% of the parent's remaining state growth budget. If exceeded, the child frame **reverts** (not halts), returning `MegaLimitExceeded(3, limit)`. The parent can catch and continue.
+
+### MegaAccessControl — Volatile Data Opt-Out (Rex4)
+
+Contracts can disable volatile data access for inner calls via the system contract at `0x6342000000000000000000000000000000000004`:
+
+```solidity
+// Prevent untrusted callees from triggering the 20M gas cap
+IMegaAccessControl(0x6342000000000000000000000000000000000004).disableVolatileDataAccess();
+(bool ok, ) = untrusted.call(data); // block.timestamp here reverts, not gas detention
+IMegaAccessControl(0x6342000000000000000000000000000000000004).enableVolatileDataAccess();
+```
 
 ## Volatile Data Access Control
 
