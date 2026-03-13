@@ -25,7 +25,7 @@ Use this skill when the user asks for:
 | Network | Address |
 |---------|---------|
 | Mainnet (4326) | `0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7` |
-| Testnet (6343) | `0xa8a7Ea151E366532ce8b0442255aE60E0ff2F833` (MockUSDM) |
+| Testnet (6343) | `0xFd16854D7fDC1399F05d5F22bfa0A2311d54eA07` |
 
 **Explorers:**
 - Mainnet: [Blockscout](https://megaeth.blockscout.com/address/0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7) · [Etherscan](https://mega.etherscan.io/address/0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7)
