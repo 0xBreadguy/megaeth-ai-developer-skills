@@ -31,14 +31,20 @@ ERC-8004 defines three singleton registries that can be deployed per chain:
 | MegaETH Testnet | 6343 | `https://carrot.megaeth.com/rpc` |
 | Ethereum Mainnet | 1 | (reference deployment) |
 
-### Known Deployments (Ethereum Mainnet)
+### Contract Addresses (All Chains — CREATE2 Deterministic)
 
-| Contract | Address |
-|----------|---------|
-| Identity Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` |
-| Reputation Registry | `0x8004BAa17C55a88189AE136b182e5fdA19dE9b63` |
+Deployed via CREATE2 — same addresses on every chain including MegaETH.
 
-> **Note:** MegaETH deployments may use the same or different addresses. Check the [ERC-8004 GitHub](https://github.com/erc-8004) for the latest multi-chain deployment list. The contracts are designed as per-chain singletons.
+| Contract | Mainnet Address | Testnet Address |
+|----------|----------------|-----------------|
+| Identity Registry | `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432` | `0x8004A818BFB912233c491871b3d84c89A494BD9e` |
+| Reputation Registry | `0x8004BAa17C55a88189AE136b182e5fdA19dE9b63` | `0x8004B663056A597Dffe9eCcC1965A193B7388713` |
+
+**Explorers:**
+- MegaETH Mainnet: [Identity](https://megaeth.blockscout.com/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432) · [Reputation](https://megaeth.blockscout.com/address/0x8004BAa17C55a88189AE136b182e5fdA19dE9b63)
+- MegaETH Testnet: [Identity](https://megaeth-testnet-v2.blockscout.com/address/0x8004A818BFB912233c491871b3d84c89A494BD9e) · [Reputation](https://megaeth-testnet-v2.blockscout.com/address/0x8004B663056A597Dffe9eCcC1965A193B7388713)
+
+Full deployment list: [erc-8004/erc-8004-contracts](https://github.com/erc-8004/erc-8004-contracts)
 
 ## Default Stack Decisions (Opinionated)
 
@@ -87,7 +93,7 @@ The agentURI resolves to a JSON registration file:
   "registrations": [
     {
       "agentId": 1,
-      "agentRegistry": "eip155:4326:0x..."
+      "agentRegistry": "eip155:4326:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
     }
   ],
   "supportedTrust": ["reputation"]
@@ -104,7 +110,7 @@ The agentURI resolves to a JSON registration file:
 ```typescript
 import { createWalletClient, http, encodePacked } from 'viem'
 
-const IDENTITY_REGISTRY = '0x...' // MegaETH deployment address
+const IDENTITY_REGISTRY = '0x8004A169FB4a3325136EB29fA0ceB6D2e539a432'
 
 // Minimal registration (set URI later)
 const agentId = await walletClient.writeContract({
@@ -221,7 +227,7 @@ GET https://agent.example/.well-known/agent-registration.json
   "registrations": [
     {
       "agentId": 1,
-      "agentRegistry": "eip155:4326:0x..."
+      "agentRegistry": "eip155:4326:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
     }
   ]
 }
@@ -234,7 +240,7 @@ GET https://agent.example/.well-known/agent-registration.json
 Any address (except the agent owner) can give feedback:
 
 ```typescript
-const REPUTATION_REGISTRY = '0x...' // MegaETH deployment address
+const REPUTATION_REGISTRY = '0x8004BAa17C55a88189AE136b182e5fdA19dE9b63'
 
 await walletClient.writeContract({
   address: REPUTATION_REGISTRY,
@@ -326,7 +332,8 @@ await walletClient.writeContract({
 Agent owners request third-party validation of their work:
 
 ```typescript
-const VALIDATION_REGISTRY = '0x...' // MegaETH deployment address
+// Validation Registry not yet deployed — check erc-8004/erc-8004-contracts for updates
+const VALIDATION_REGISTRY = '0x...'
 
 await walletClient.writeContract({
   address: VALIDATION_REGISTRY,
@@ -391,7 +398,7 @@ agentId: {tokenId}
 
 For MegaETH mainnet:
 ```
-eip155:4326:0x...  (Identity Registry address on MegaETH)
+eip155:4326:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432
 ```
 
 An agent registered on MegaETH can operate and transact on any chain. Multi-chain registration is also supported.
@@ -402,7 +409,7 @@ Optional detailed feedback stored on IPFS:
 
 ```json
 {
-  "agentRegistry": "eip155:4326:0x...",
+  "agentRegistry": "eip155:4326:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
   "agentId": 1,
   "clientAddress": "eip155:4326:0xClientAddr",
   "createdAt": "2026-03-12T00:00:00Z",
