@@ -1,6 +1,6 @@
 ---
 name: megaeth-developer
-description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, debugging with mega-evme, and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, hosting websites on-chain with Warren, or integrating MegaNames (.mega naming service) for name registration, resolution, subdomains, subdomain marketplace (selling/buying subdomains with token gating), and text records.
+description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, debugging with mega-evme, Meridian x402 payments on MegaETH (seller-side settlement plus buyer-side USDm forwarder approvals and EIP-712 authorizations), and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, integrating Meridian/x402 paid APIs or agent actions, hosting websites on-chain with Warren, or integrating MegaNames (.mega naming service) for name registration, resolution, subdomains, subdomain marketplace (selling/buying subdomains with token gating), and text records.
 ---
 
 # MegaETH Development Skill
@@ -22,6 +22,7 @@ Use this Skill when the user asks for:
 - WebSocket subscriptions and mini-block streaming
 - Bridging ETH from Ethereum to MegaETH
 - Privy integration for headless/automated signing
+- Meridian / x402 payments on MegaETH
 - Ultra-low latency transaction patterns
 - ERC-7710 delegations (scoped permissions, spending limits, redelegation chains)
 - MetaMask Smart Accounts (ERC-4337 accounts, signers, user operations)
@@ -105,6 +106,7 @@ When implementing changes, provide:
 - Wallet operations: [wallet-operations.md](wallet-operations.md)
 - Frontend patterns: [frontend-patterns.md](frontend-patterns.md)
 - Privy integration: [privy-integration.md](privy-integration.md)
+- Meridian payments: [meridian.md](meridian.md)
 - RPC methods reference: [rpc-methods.md](rpc-methods.md)
 - Smart contract patterns: [smart-contracts.md](smart-contracts.md)
 - Storage optimization: [storage-optimization.md](storage-optimization.md)

@@ -12,6 +12,7 @@ This skill provides AI agents with deep knowledge of the MegaETH development eco
 - **Gas Model**: MegaEVM-specific costs and estimation strategies
 - **Debugging**: mega-evme CLI for transaction replay and gas profiling
 - **Security**: MegaETH-specific considerations and audit checklists
+- **Meridian**: x402 payments on MegaETH for seller/server and buyer/agent flows
 - **MegaNames**: .mega naming service — registration, resolution, subdomains, subdomain marketplace
 
 ## Installation
@@ -49,6 +50,7 @@ clawdhub install megaeth-developer
 ├── security.md               # Vulnerabilities and prevention
 ├── erc7710-delegations.md    # ERC-7710 delegation framework, caveats, permissions
 ├── smart-accounts.md         # MetaMask Smart Accounts Kit, signers, user operations
+├── meridian.md               # Meridian x402 payments on MegaETH
 ├── meganames.md              # MegaNames (.mega) — registration, resolution, subdomains, marketplace
 ├── warren.md                 # Warren Protocol — on-chain website hosting
 └── resources.md              # Links, tools, explorers, bridges, DEX
@@ -82,6 +84,8 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 "Create a MetaMask Smart Account on MegaETH"
 "Set up spending limits and time-bound permissions"
 "Implement redelegation chains"
+"Protect an API route with Meridian on MegaETH"
+"Set up a buyer agent to pay with USDm through Meridian"
 "Register a .mega name and resolve it"
 "Set up subdomain sales with token gating"
 "Integrate MegaNames resolution into my dApp"
