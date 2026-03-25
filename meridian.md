@@ -1,12 +1,22 @@
-# Meridian x402 Payments on MegaETH
+# Meridian x402 Payments on MegaETH (Legacy)
+
+> **⚠️ DEPRECATED:** This document describes the legacy
+> Meridian/EIP-3009 forwarder flow. The x402 Permit2Proxy
+> contracts are now deployed on MegaETH at canonical
+> addresses. **Use `x402-payments.md` for new
+> integrations.** This file is retained for backward
+> compatibility with existing Meridian deployments.
 
 AI coding skill for integrating Meridian x402 payments on MegaETH. Covers the seller/server setup that owns the Meridian organization and API key, plus the buyer/agent flow that approves USDm, signs the MegaETH forwarder authorization, and sends a raw `paymentPayload` JSON object back to the seller.
 
 ## What This Skill Is For
 
-Use this skill when the user asks for:
-- Meridian or x402 payments on MegaETH
-- Protecting APIs, tools, MCP servers, or agent actions with paid access
+Use this skill **only** when maintaining existing
+Meridian integrations. For new projects, use
+`x402-payments.md` (Permit2 flow).
+
+Legacy use cases:
+- Existing Meridian deployments that haven't migrated
 - Seller/server-side Meridian settlement with `/v1/settle`
 - Buyer/agent-side USDm approval plus EIP-712 `TransferWithAuthorization`
 - MegaETH-specific Meridian wiring: USDm, forwarder, facilitator, and payment payload shape
