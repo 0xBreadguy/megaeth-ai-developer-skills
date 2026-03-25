@@ -144,7 +144,7 @@ async function submitWithRetry(tx: Transaction, maxRetries = 3) {
 1. **Use mega-evme** for transaction replay and gas profiling
 2. **Test with realistic gas costs** — fork testnet, don't simulate locally
 3. **Review SSTORE patterns** — each new slot is expensive
-4. **Check volatile data usage** — 20M gas limit after block metadata access
+4. **Check volatile data usage** — 20M total compute gas cap (retroactive) when block metadata is accessed
 5. **Verify CPI targets** — don't allow arbitrary external calls
 
 ## Security Review Questions
@@ -171,6 +171,39 @@ const monitor = new TransactionMonitor({
   }
 });
 ```
+
+## Input Validation: Allowlist Over Blocklist
+
+Always validate user inputs with strict allowlists, never blocklists:
+
+```solidity
+// ❌ Blocklist — misses null bytes, emoji, control chars, <script>, etc.
+function validate(string memory input) internal pure {
+    // Only blocks dots
+    require(!containsDot(input), "No dots");
+    // Everything else passes — including malicious inputs
+}
+
+// ✅ Allowlist — only permits known-safe characters
+function validate(string memory label) internal pure returns (string memory) {
+    bytes memory b = bytes(label);
+    require(b.length > 0 && b.length <= 255, "Invalid length");
+    require(b[0] != 0x2d && b[b.length - 1] != 0x2d, "No leading/trailing hyphens");
+    
+    for (uint256 i; i < b.length; i++) {
+        bytes1 c = b[i];
+        require(
+            (c >= 0x61 && c <= 0x7a) || // a-z
+            (c >= 0x30 && c <= 0x39) || // 0-9
+            c == 0x2d,                   // hyphen
+            "Invalid character"
+        );
+    }
+    return label;
+}
+```
+
+**Lesson:** A blocklist approach once let null bytes, spaces, `<script>` tags, emoji, and control characters through validation. 43 functional tests all passed but missed these cases. Always test inputs adversarially.
 
 ## Resources
 

@@ -9,41 +9,73 @@ MegaEVM is fully compatible with Ethereum contracts but has different:
 
 ## Contract Limits
 
-| Resource | Limit |
-|----------|-------|
-| Contract code | 512 KB |
-| Calldata | 128 KB |
-| eth_call/estimateGas | 10M gas (public), higher on VIP |
+| Resource | TX Limit | Block Limit |
+|----------|----------|-------------|
+| Contract code | 512 KB | — |
+| Calldata | 128 KB | — |
+| State growth | 1,000 slots | 1,000 slots |
+| eth_call/estimateGas | 10M gas (public) | higher on VIP |
+
+**Note:** The last tx in a block can push state growth past 1,000 — post-execution limits allow the exceeding tx to be included, then the block closes.
+
+### Per-Frame State Growth (Rex4)
+
+Inner call frames receive 98% of the parent's remaining state growth budget. If exceeded, the child frame **reverts** (not halts), returning `MegaLimitExceeded(3, limit)`. The parent can catch and continue.
+
+### MegaAccessControl — Volatile Data Opt-Out (Rex4)
+
+Contracts can disable volatile data access for inner calls via the system contract at `0x6342000000000000000000000000000000000004`:
+
+```solidity
+// Prevent untrusted callees from triggering the 20M gas cap
+IMegaAccessControl(0x6342000000000000000000000000000000000004).disableVolatileDataAccess();
+(bool ok, ) = untrusted.call(data); // block.timestamp here reverts, not gas detention
+IMegaAccessControl(0x6342000000000000000000000000000000000004).enableVolatileDataAccess();
+```
 
 ## Volatile Data Access Control
 
-After accessing block metadata, transaction is limited to 20M additional compute gas.
+Accessing block metadata caps the **total** compute gas for the entire transaction to 20M. This cap is **retroactive** — it applies to all compute gas used in the transaction, not just gas consumed after the volatile opcode. If the transaction has already burned more than 20M compute gas before touching `block.timestamp`, it immediately reverts with OOG.
 
 **Affected opcodes:**
-- `TIMESTAMP` / `block.timestamp`
-- `NUMBER` / `block.number`
-- `BLOCKHASH` / `blockhash(n)`
+- `TIMESTAMP`, `NUMBER`, `BLOCKHASH`, `BASEFEE`, `PREVRANDAO`, `GASLIMIT`, `COINBASE`, `BLOBBASEFEE`, `BLOBHASH`
+- Any access to the beneficiary account (`BALANCE`, `EXTCODESIZE`, `EXTCODEHASH` on coinbase address)
+- Oracle contract SLOAD (also 20M cap since Rex3; was 1M pre-Rex3)
 
 ```solidity
-// ❌ Problematic pattern
+// ❌ Front-loading does NOT help — cap is retroactive
 function process() external {
-    uint256 ts = block.timestamp;  // Triggers limit
-    // Complex computation here will hit 20M gas ceiling
     for (uint i = 0; i < 10000; i++) {
-        // Heavy work...
+        // Burns >20M compute gas...
+    }
+    uint256 ts = block.timestamp;  // Immediately OOGs — total already exceeds 20M
+}
+
+// ❌ Also fails — same reason
+function process() external {
+    uint256 ts = block.timestamp;  // Sets 20M total cap
+    for (uint i = 0; i < 10000; i++) {
+        // Will OOG once cumulative compute gas exceeds 20M
     }
 }
 
-// ✅ Better: access metadata late
+// ✅ Keep total compute gas under 20M when using block metadata
 function process() external {
-    // Do heavy computation first
-    for (uint i = 0; i < 10000; i++) {
-        // Heavy work...
-    }
-    // Access metadata at the end
-    emit Processed(block.timestamp);
+    uint256 ts = block.timestamp;
+    // Light computation only — stay under 20M total
+    lastUpdated = ts;
+    emit Processed(ts);
+}
+
+// ✅ For high-precision time without the cap, use the timestamp oracle
+function process() external {
+    uint256 microTs = ITimestampOracle(ORACLE).readTimestamp();
+    // Oracle SLOAD has its own 20M cap (Rex3), but separate from block env
+    // Heavy computation is fine if you don't also touch block.timestamp
 }
 ```
+
+**Key insight:** If your contract needs both heavy computation AND time-awareness, split them into separate transactions or use the timestamp oracle.
 
 **Spec:** https://github.com/megaeth-labs/mega-evm/blob/main/specs/MiniRex.md#28-volatile-data-access-control
 
@@ -386,10 +418,95 @@ MegaETH uses OP Stack. Standard bridge contracts and predeploys are available:
 
 See OP Stack docs for full predeploy list.
 
+## On-Chain SVG / Metadata Generation
+
+MegaETH's 512KB contract size limit makes on-chain SVG generation practical. Key patterns:
+
+### Stack Depth Management
+
+SVG generation hits stack-too-deep easily. Each `internal pure` function gets its own stack frame:
+
+```solidity
+// ❌ One big function — stack-too-deep
+function generateSVG() internal pure returns (string memory) {
+    string memory bg = ...;
+    string memory border = ...;
+    string memory name = ...;
+    string memory info = ...;  // Stack overflow
+    return string.concat(bg, border, name, info);
+}
+
+// ✅ Split into small functions — each gets its own stack
+function _svg() internal pure returns (string memory) {
+    string memory part1 = string.concat(_svgOpen(), _svgBg());
+    string memory part2 = _svgCorners();
+    string memory part3 = string.concat(_svgName(), _svgInfo(), _svgClose());
+    return string.concat(part1, part2, part3);
+}
+
+function _svgBg() internal pure returns (string memory) { ... }
+function _svgCorners() internal pure returns (string memory) { ... }
+function _svgName() internal pure returns (string memory) { ... }
+```
+
+### Parameter Packing
+
+When you need to pass many values between functions, pack into fixed-size arrays:
+
+```solidity
+// ❌ Too many params — stack overflow
+function _render(string memory a, uint256 b, uint64 c, bool d, string memory e, uint8 f) ...
+
+// ✅ Pack into array
+function _render(uint256[6] memory params) internal pure returns (string memory) { ... }
+```
+
+### Upgradeable Renderer Pattern
+
+Instead of proxy patterns, use a swappable external renderer for NFT metadata:
+
+```solidity
+address public tokenURIRenderer;
+
+function tokenURI(uint256 tokenId) public view override returns (string memory) {
+    if (tokenURIRenderer != address(0)) {
+        return ITokenURIRenderer(tokenURIRenderer).tokenURI(tokenId);
+    }
+    return _defaultTokenURI(tokenId); // Built-in fallback
+}
+
+function setTokenURIRenderer(address renderer) external onlyOwner {
+    tokenURIRenderer = renderer;
+}
+```
+
+This lets you iterate NFT visuals by deploying new renderer contracts without touching the main contract. Keep renderers **stateless** (read from the main contract) so redeployment needs zero migration.
+
+## Etherscan V2 API (Contract Verification)
+
+MegaETH uses the Etherscan V2 API with chain ID parameter:
+
+```bash
+# V2 endpoint (preferred)
+https://api.etherscan.io/v2/api?chainid=4326
+
+# Verify contract
+forge verify-contract <address> src/MyContract.sol:MyContract \
+  --chain 4326 \
+  --etherscan-api-key $ETHERSCAN_KEY \
+  --verifier-url "https://api.etherscan.io/v2/api?chainid=4326"
+
+# Explorer
+https://mega.etherscan.io
+```
+
 ## Common Issues
 
 ### "Intrinsic gas too low"
-Local simulation uses wrong opcode costs. Use `--skip-simulation` or remote estimation.
+Local simulation uses wrong opcode costs. Use `--skip-simulation` or remote estimation. For large contracts (25KB+ bytecode), use `--gas-limit 500000000` (500M).
+
+### `via_ir` silently breaks return values
+**Never use `via_ir=true`** in foundry.toml. It can cause functions to return 0 instead of correct values with no compiler error. Use `optimizer=true` with `optimizer_runs=200` instead.
 
 ### "Out of gas" after block.timestamp
 Hitting volatile data access limit. Restructure to access metadata late.
