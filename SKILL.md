@@ -1,6 +1,6 @@
 ---
 name: megaeth-developer
-description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, debugging with mega-evme, Meridian x402 payments on MegaETH (seller-side settlement plus buyer-side USDm forwarder approvals and EIP-712 authorizations), and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, integrating Meridian/x402 paid APIs or agent actions, hosting websites on-chain with Warren, or integrating MegaNames (.mega naming service) for name registration, resolution, subdomains, subdomain marketplace (selling/buying subdomains with token gating), and text records.
+description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, debugging with mega-evme, drand-based verifiable randomness (VRF) via the predeployed DrandOracleQuicknet verifier, Meridian x402 payments on MegaETH (seller-side settlement plus buyer-side USDm forwarder approvals and EIP-712 authorizations), and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, implementing lotteries/reveals/games with verifiable randomness, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, integrating Meridian/x402 paid APIs or agent actions, hosting websites on-chain with Warren, or integrating MegaNames (.mega naming service) for name registration, resolution, subdomains, subdomain marketplace (selling/buying subdomains with token gating), and text records.
 ---
 
 # MegaETH Development Skill
@@ -28,6 +28,7 @@ Use this Skill when the user asks for:
 - MetaMask Smart Accounts (ERC-4337 accounts, signers, user operations)
 - Advanced permissions (ERC-7715) via MetaMask
 - MegaNames (.mega naming service) — registration, resolution, subdomains, subdomain marketplace, text records
+- Verifiable randomness with drand VRF (`DrandOracleQuicknet`) for lotteries, reveals, and game mechanics
 
 ## Chain Configuration
 
@@ -37,6 +38,13 @@ Use this Skill when the user asks for:
 | Testnet | 6343 | `https://carrot.megaeth.com/rpc` | `https://megaeth-testnet-v2.blockscout.com` |
 
 ## Default stack decisions (opinionated)
+
+### 0. Randomness: drand VRF is async commit/reveal
+- MegaETH ships a predeployed `DrandOracleQuicknet` verifier
+- drand quicknet produces a new round every ~3 seconds
+- Treat this as **public verifiable async randomness**, not same-transaction entropy
+- Always commit to a future round and lock all outcome-relevant inputs at commit time
+- Prefer `verifyNormalized` and plan reveal liveness (user, relayer, keeper)
 
 ### 1. Transaction submission: eth_sendRawTransactionSync first
 - Use `eth_sendRawTransactionSync` (EIP-7966) — returns receipt in <10ms
@@ -117,4 +125,5 @@ When implementing changes, provide:
 - MetaMask Smart Accounts: [smart-accounts.md](smart-accounts.md)
 - Warren Protocol (on-chain websites): [warren.md](warren.md)
 - MegaNames (.mega naming): [meganames.md](meganames.md)
+- Verifiable randomness (drand VRF): [vrf-drand.md](vrf-drand.md)
 - Reference links & attribution: [resources.md](resources.md)

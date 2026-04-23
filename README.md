@@ -14,6 +14,7 @@ This skill provides AI agents with deep knowledge of the MegaETH development eco
 - **Security**: MegaETH-specific considerations and audit checklists
 - **Meridian**: x402 payments on MegaETH for seller/server and buyer/agent flows
 - **MegaNames**: .mega naming service — registration, resolution, subdomains, subdomain marketplace
+- **VRF / Randomness**: drand quicknet verifier integration for lotteries, reveals, and game mechanics
 
 ## Installation
 
@@ -53,6 +54,7 @@ clawdhub install megaeth-developer
 ├── meridian.md               # Meridian x402 payments on MegaETH
 ├── meganames.md              # MegaNames (.mega) — registration, resolution, subdomains, marketplace
 ├── warren.md                 # Warren Protocol — on-chain website hosting
+├── vrf-drand.md              # drand VRF / verifiable randomness on MegaETH
 └── resources.md              # Links, tools, explorers, bridges, DEX
 ```
 
@@ -84,6 +86,8 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 "Create a MetaMask Smart Account on MegaETH"
 "Set up spending limits and time-bound permissions"
 "Implement redelegation chains"
+"Build a lottery or reveal flow with drand VRF on MegaETH"
+"How should I safely integrate randomness on MegaETH?"
 "Protect an API route with Meridian on MegaETH"
 "Set up a buyer agent to pay with USDm through Meridian"
 "Register a .mega name and resolve it"
