@@ -51,6 +51,7 @@ clawdhub install megaeth-developer
 ├── security.md               # Vulnerabilities and prevention
 ├── erc7710-delegations.md    # ERC-7710 delegation framework, caveats, permissions
 ├── smart-accounts.md         # MetaMask Smart Accounts Kit, signers, user operations
+├── gator-cli.md              # MetaMask Delegation Toolkit CLI for delegations and redemption flows
 ├── meridian.md               # Meridian x402 payments on MegaETH
 ├── meganames.md              # MegaNames (.mega) — registration, resolution, subdomains, marketplace
 ├── warren.md                 # Warren Protocol — on-chain website hosting
@@ -84,6 +85,7 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 "Debug this failed transaction on MegaETH"
 "Set up ERC-7710 delegations and scoped permissions"
 "Create a MetaMask Smart Account on MegaETH"
+"Use gator-cli with a delegated MegaETH wallet"
 "Set up spending limits and time-bound permissions"
 "Implement redelegation chains"
 "Build a lottery or reveal flow with drand VRF on MegaETH"
@@ -141,6 +143,8 @@ This skill incorporates best practices from:
 - [MegaETH Official Documentation](https://docs.megaeth.com)
 - [MegaEVM Specification](https://github.com/megaeth-labs/mega-evm)
 - [EIP-7966 (eth_sendRawTransactionSync)](https://ethereum-magicians.org/t/eip-7966-eth-sendrawtransactionsync-method/24640)
+- [MetaMask Smart Accounts Kit](https://github.com/MetaMask/smart-accounts-kit)
+- [MetaMask Delegation Toolkit / gator](https://github.com/MetaMask/gator)
 - MegaETH team technical guidance
 
 ## Contributing
