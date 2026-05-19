@@ -29,11 +29,17 @@ The authoritative source for MegaETH's execution layer is now the spec site:
 
 ## Official Documentation
 
-- **MegaETH Docs**: https://docs.megaeth.com
+- **MegaETH Docs home**: https://docs.megaeth.com/readme.md
 - **Spec (LLM-friendly, queryable docs site)**: https://docs.megaeth.com/spec
-- **Real-time API**: https://docs.megaeth.com/realtime-api
-- **Testnet Guide**: https://docs.megaeth.com/testnet
-- **Frontier (Mainnet)**: https://docs.megaeth.com/frontier
+- **Realtime API**: https://docs.megaeth.com/developer-docs/overview-2/realtime-api.md
+- **Connect to MegaETH**: https://docs.megaeth.com/user-guide/connect.md
+- **Get ETH on Testnet**: https://docs.megaeth.com/user-guide/faucet.md
+- **Get Funds on Mainnet**: https://docs.megaeth.com/user-guide/bridge.md
+- **VRF**: https://docs.megaeth.com/developer-docs/vrf
+- **Docs sitemap**: https://docs.megaeth.com/sitemap.md
+- **Full docs export**: https://docs.megaeth.com/llms-full.txt
+
+**Agent note:** Prefer `.md` documentation URLs when possible. The docs site supports LLM-friendly retrieval, sitemap discovery, and ask-style query patterns.
 
 ## Source Code
 
