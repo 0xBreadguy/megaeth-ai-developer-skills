@@ -328,7 +328,7 @@ async function getNextNonce(
 
 ### Why This Matters
 
-MegaETH's ~10ms blocks mean transactions confirm quickly, but if you send multiple txs in rapid succession (e.g., trading bot, batch operations), the second tx may hit the RPC before the first confirms. Without local tracking, both get the same nonce → "already known" error.
+MegaETH's low-latency block production means transactions can confirm quickly, but if you send multiple txs in rapid succession (e.g., trading bot, batch operations), the second tx may hit the RPC before the first confirms. Without local tracking, both get the same nonce → "already known" error.
 
 ### Backend/Bot Pattern
 

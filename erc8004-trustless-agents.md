@@ -49,7 +49,7 @@ Full deployment list: [erc-8004/erc-8004-contracts](https://github.com/erc-8004/
 ## Default Stack Decisions (Opinionated)
 
 ### 1. Use `eth_sendRawTransactionSync` for all writes
-MegaETH returns receipts in <10ms via EIP-7966. No polling needed after registration or feedback calls.
+MegaETH supports EIP-7966-style synchronous receipt return, so no separate polling loop is needed after registration or feedback calls. Do not assume a fixed sub-10ms end-to-end latency guarantee.
 
 ### 2. Use viem over ethers.js
 The `@agentic-trust/8004-sdk` supports both. Prefer viem for consistency with MegaETH patterns.

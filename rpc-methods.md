@@ -315,7 +315,7 @@ const [a, b, c] = await fetch(RPC_URL, {
 With optimal setup (local node + WebSocket + pre-signed):
 - Sign: ~1ms (pre-computed)
 - Network to local node: ~1ms
-- MegaETH processing: ~10ms
+- MegaETH execution is designed for very low-latency processing, but end-to-end timing still depends on RPC/network path
 - **Total: ~12ms**
 
 ## Debugging Commands

@@ -29,7 +29,7 @@ function store(uint256 key, uint256 value) external {
 // Auction ends at timestamp
 if (block.timestamp >= auctionEnd) {
     // MegaETH block.timestamp has 1s granularity
-    // But mini-blocks happen every 10ms
+    // But MegaETH mini-blocks are very frequent
     // Attacker can exploit timing window
 }
 ```
@@ -41,7 +41,7 @@ if (block.timestamp >= auctionEnd) {
 
 ### 3. Reorg Considerations
 
-MegaETH has fast finality (<10ms) but reorgs are theoretically possible until L1 finalization.
+MegaETH has fast soft-finality characteristics, but reorgs are theoretically possible until L1 finalization.
 
 **Prevention**:
 - For high-value operations, wait for confirmation count

@@ -106,7 +106,7 @@ async function warmupRpcConnection(client: PublicClient) {
 // Now first real transaction won't have cold-start latency
 ```
 
-**Why it matters:** MegaETH has <10ms block times. A cold connection can add 50-200ms of overhead on the first request. Warming up ensures the connection pool is ready when users transact.
+**Why it matters:** MegaETH is designed for very low-latency block production, so avoid adding unnecessary client-side connection/setup overhead. A cold connection can add 50-200ms of overhead on the first request. Warming up ensures the connection pool is ready when users transact.
 
 **Best practice:** Call `eth_chainId` or `eth_blockNumber` on:
 - App initialization

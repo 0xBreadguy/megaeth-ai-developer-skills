@@ -17,18 +17,20 @@ This skill combines multiple sources. Key technical claims are validated against
 
 ## Primary MegaEVM Specification
 
-The authoritative source for MegaETH's execution layer:
+The authoritative source for MegaETH's execution layer is now the spec site:
 
 | Document | URL |
 |----------|-----|
-| Dual Gas Model | [DUAL_GAS_MODEL.md](https://github.com/megaeth-labs/mega-evm/blob/main/docs/DUAL_GAS_MODEL.md) |
-| Block & TX Limits | [BLOCK_AND_TX_LIMITS.md](https://github.com/megaeth-labs/mega-evm/blob/main/docs/BLOCK_AND_TX_LIMITS.md) |
-| MiniRex Spec | [MiniRex.md](https://github.com/megaeth-labs/mega-evm/blob/main/specs/MiniRex.md) |
-| Rex Spec | [Rex.md](https://github.com/megaeth-labs/mega-evm/blob/main/specs/Rex.md) |
+| Spec landing page | [docs.megaeth.com/spec](https://docs.megaeth.com/spec) |
+| MegaEVM overview | [docs.megaeth.com/spec/megaevm/overview](https://docs.megaeth.com/spec/megaevm/overview) |
+| Hardfork/spec progression | [docs.megaeth.com/spec/hardfork-spec](https://docs.megaeth.com/spec/hardfork-spec) |
+| System contracts overview | [docs.megaeth.com/spec/system-contracts/overview](https://docs.megaeth.com/spec/system-contracts/overview) |
+| Upstream implementation repo | [megaeth-labs/mega-evm](https://github.com/megaeth-labs/mega-evm) |
 
 ## Official Documentation
 
 - **MegaETH Docs**: https://docs.megaeth.com
+- **Spec (LLM-friendly, queryable docs site)**: https://docs.megaeth.com/spec
 - **Real-time API**: https://docs.megaeth.com/realtime-api
 - **Testnet Guide**: https://docs.megaeth.com/testnet
 - **Frontier (Mainnet)**: https://docs.megaeth.com/frontier
@@ -38,15 +40,24 @@ The authoritative source for MegaETH's execution layer:
 - **MegaEVM**: https://github.com/megaeth-labs/mega-evm
 - **MegaEVM Spec (MiniRex)**: https://github.com/megaeth-labs/mega-evm/blob/main/specs/MiniRex.md
 
-## Token List
+## Token Registry / Token Lists
 
-**Official:** https://github.com/megaeth-labs/mega-tokenlist
+**Official registry:** https://github.com/megaeth-labs/mega-tokenlist
 
-The canonical source for verified token addresses, symbols, decimals, and logos on MegaETH. Use this repo to:
+The canonical source for verified token addresses, symbols, decimals, and logos on MegaETH.
+
+Use this repo to:
 - Look up token contract addresses
 - Get token metadata (name, symbol, decimals)
 - Access official token logos
 - Verify token legitimacy
+- Check whether a token is listed for **mainnet** vs the separate **testnet** tokenlist
+
+Recent examples relevant to agents:
+- testnet `USDM` / `MegaUSD` deployment support via `megaeth_testnet`
+- testnet `MEGA` deployment support via `megaeth_testnet`
+
+Agents should prefer the token registry over ad hoc explorer scraping when they need canonical token metadata.
 
 ## Tools
 

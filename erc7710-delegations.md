@@ -227,7 +227,7 @@ const delegation = createDelegation({
 
 ## MegaETH Advantage
 
-Use `eth_sendRawTransactionSync` for instant delegation redemption — get the receipt in <10ms instead of polling. This is critical for real-time delegation flows (AI agents, automated trading, session keys).
+Use `eth_sendRawTransactionSync` for synchronous delegation redemption receipts instead of a separate polling loop. This is helpful for real-time delegation flows (AI agents, automated trading, session keys), but actual end-to-end latency still depends on RPC/network conditions.
 
 > **Note:** MegaETH caps `eth_call` and `eth_estimateGas` at 10M gas per call. Heavy delegation operations (large caveat chains) should account for this limit.
 
