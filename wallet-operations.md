@@ -78,7 +78,7 @@ node src/balance.js megaeth 0x4200000000000000000000000000000000000006 --json
 
 ## Send Transactions
 
-### Instant Receipts
+### Low-Latency Synchronous Receipts
 
 MegaETH supports synchronous transaction submission — the receipt is returned in the same RPC flow, so you usually do not need a follow-up polling loop.
 
@@ -98,7 +98,7 @@ const signedTx = await wallet.signTransaction({
   maxPriorityFeePerGas: 0n
 });
 
-// Send with instant receipt
+// Send with synchronous receipt return
 const receipt = await client.request({
   method: 'eth_sendRawTransactionSync',
   params: [signedTx]
@@ -281,7 +281,7 @@ const tx = await wallet.sendTransaction({
 MegaETH is designed for very low-latency block production and synchronous receipt flows. In practice, user-observed confirmation speed still depends on RPC/network latency and should not be described as guaranteed `~10ms` end-to-end UX.
 
 ```typescript
-// With eth_sendRawTransactionSync — instant
+// With eth_sendRawTransactionSync — immediate-feeling synchronous flow
 const receipt = await client.request({
   method: 'eth_sendRawTransactionSync',
   params: [signedTx]

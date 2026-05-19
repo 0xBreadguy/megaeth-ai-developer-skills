@@ -11,9 +11,9 @@ Third-party providers: Alchemy, QuickNode (recommended for geo-distributed acces
 
 ## MegaETH-Specific Methods
 
-### Instant Transaction Receipts
+### Low-Latency Synchronous Transaction Receipts
 
-MegaETH supports synchronous transaction submission — the RPC can return a receipt directly instead of requiring a separate polling loop.
+MegaETH supports synchronous transaction submission — the RPC can return a receipt directly instead of requiring a separate polling loop, which is a big part of its immediate-feeling developer UX.
 
 **Two equivalent methods:**
 

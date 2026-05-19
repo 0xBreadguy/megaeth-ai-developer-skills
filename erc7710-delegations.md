@@ -140,7 +140,7 @@ const userOpHash = await bundlerClient.sendUserOperation({
   calls: [{ to: delegateSmartAccount.address, data: redeemCalldata }],
 });
 
-// Via EOA — use eth_sendRawTransactionSync for instant receipt on MegaETH
+// Via EOA — use eth_sendRawTransactionSync for low-latency synchronous receipt return on MegaETH
 const txHash = await delegateWalletClient.sendTransaction({
   to: environment.DelegationManager,
   data: redeemCalldata,

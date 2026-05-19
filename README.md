@@ -6,7 +6,7 @@ A comprehensive skill for AI coding agents (Claude Code, OpenClaw, Codex) to bui
 
 This skill provides AI agents with deep knowledge of the MegaETH development ecosystem:
 
-- **Transactions**: `eth_sendRawTransactionSync` (EIP-7966) for synchronous receipt return without polling
+- **Transactions**: `eth_sendRawTransactionSync` (EIP-7966) for low-latency synchronous receipt return without polling
 - **RPC Patterns**: JSON-RPC batching, WebSocket keepalive, mini-block subscriptions
 - **Storage**: Optimization patterns to avoid expensive SSTORE costs
 - **Gas Model**: MegaEVM-specific costs and estimation strategies
@@ -108,7 +108,7 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 
 ### Synchronous Transaction Receipts
 
-MegaETH supports `eth_sendRawTransactionSync` (EIP-7966), which returns a receipt synchronously instead of requiring a separate polling loop:
+MegaETH supports `eth_sendRawTransactionSync` (EIP-7966), which enables low-latency synchronous receipt return instead of requiring a separate polling loop:
 
 ```typescript
 const receipt = await client.request({

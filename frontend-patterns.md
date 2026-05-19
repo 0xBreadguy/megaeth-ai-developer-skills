@@ -128,7 +128,7 @@ export async function submitTransaction(signedTx: `0x${string}`) {
     transport: http('https://mainnet.megaeth.com/rpc')
   });
 
-  // Use sync method for instant receipt
+  // Use sync method for immediate-feeling receipt return
   const receipt = await client.request({
     method: 'eth_sendRawTransactionSync',
     params: [signedTx]

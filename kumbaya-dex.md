@@ -88,7 +88,7 @@ npm install @kumbaya_xyz/sdk-core @kumbaya_xyz/v3-sdk @kumbaya_xyz/smart-order-r
 QuoterV2 is a read-only quoter (use `staticCall`). SwapRouter02 executes swaps. Don't mix them.
 
 ### 2. Use `eth_sendRawTransactionSync` for swap execution
-Instant receipts via EIP-7966. No polling needed — critical for trading bots.
+Low-latency synchronous receipts via EIP-7966. No separate polling loop needed — useful for trading bots and immediate-feeling swap UX.
 
 ### 3. Use Permit2 for token approvals
 One-time infinite approve of each token to Permit2, then sign per-swap permits. Better UX and security than per-contract approvals.

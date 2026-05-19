@@ -430,7 +430,7 @@ Optional detailed feedback stored on IPFS:
 ## MegaETH-Specific Notes
 
 - **Gas:** Registration mints an ERC-721 (new storage slots). Use `eth_estimateGas` via RPC — MegaETH SSTORE costs differ from standard EVM.
-- **Instant receipts:** Use `eth_sendRawTransactionSync` (EIP-7966) for all write operations.
+- **Low-latency synchronous receipts:** Use `eth_sendRawTransactionSync` (EIP-7966) for all write operations.
 - **State growth:** Each new agent identity creates storage slots. Be aware of MegaETH's 1,000 slot per-tx limit for batch operations.
 - **Subgraphs:** Feedback data is stored on-chain + emitted as events. Use subgraphs or event indexing for efficient querying.
 - **Sybil resistance:** Always filter reputation queries by trusted `clientAddresses`. Unfiltered `getSummary` calls are meaningless.
