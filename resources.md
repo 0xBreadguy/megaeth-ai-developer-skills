@@ -44,7 +44,6 @@ The authoritative source for MegaETH's execution layer is now the spec site:
 ## Source Code
 
 - **MegaEVM**: https://github.com/megaeth-labs/mega-evm
-- **MegaEVM Spec (MiniRex)**: https://github.com/megaeth-labs/mega-evm/blob/main/specs/MiniRex.md
 
 ## Token Registry / Token Lists
 

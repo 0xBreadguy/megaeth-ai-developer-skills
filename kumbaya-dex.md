@@ -448,7 +448,7 @@ contract MySwapper {
 
 ## MegaETH-Specific Notes
 
-- **Synchronous receipts:** Use `eth_sendRawTransactionSync` for swap execution so the receipt is returned in the same RPC flow. This is useful for MEV-sensitive and bot flows, but do not assume guaranteed sub-10ms end-to-end confirmation.
+- **Synchronous receipts:** Use `eth_sendRawTransactionSync` for swap execution so the receipt is returned in the same RPC flow. This is useful for MEV-sensitive and bot flows.
 - **Gas:** Use `eth_estimateGas` via RPC. MegaETH SSTORE costs differ — first-time Permit2 approval is expensive (new storage slot), subsequent swaps are cheap.
 - **No mempool:** MegaETH has no public mempool. Transactions are ordered by the sequencer. Front-running risk is structurally lower than Ethereum.
 - **Multicall:** Use Multicall2 (`0xf6f404ac6289ab8eB1caf244008b5F073d59385c`) to batch read calls (pool state + quote + balances in one RPC call).
