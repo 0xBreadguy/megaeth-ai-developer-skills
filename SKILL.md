@@ -82,9 +82,9 @@ Use this Skill when the user asks for:
 - Hardcode gas limits to save round-trip
 - Always use remote `eth_estimateGas` (MegaEVM costs differ from standard EVM)
 
-### 6. Debugging: mega-evme CLI
-- Replay transactions with full traces
-- Profile gas by opcode
+### 6. Debugging: Foundry first, mega-evme when MegaEVM specifics matter
+- Use Foundry for fast local iteration and regression tests
+- Use `mega-evme` for live transaction replay, trace analysis, and MegaEVM/spec-specific debugging
 - https://github.com/megaeth-labs/mega-evm
 
 ## Operating procedure

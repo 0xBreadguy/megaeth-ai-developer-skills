@@ -1,4 +1,9 @@
-# Debugging Guide
+# Testing & Debugging Guide
+
+This file is the broad testing/debugging entrypoint.
+
+- Use this file for **Foundry, general testing patterns, and common troubleshooting**.
+- Use [`mega-evme.md`](mega-evme.md) when the task is specifically about **local replay, trace analysis, MegaEVM-specific resource accounting, or spec-aware debugging**.
 
 ## mega-evme CLI
 
