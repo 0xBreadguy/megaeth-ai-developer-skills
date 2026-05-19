@@ -19,6 +19,7 @@ Use this Skill when the user asks for:
 - Storage optimization (transient storage, Solady patterns)
 - Gas estimation and fee configuration
 - Testing and debugging MegaETH transactions
+- Local transaction replay / debugging with mega-evme
 - WebSocket subscriptions and mini-block streaming
 - Bridging ETH from Ethereum to MegaETH
 - Privy integration for headless/automated signing
@@ -127,6 +128,7 @@ When implementing changes, provide:
 - Storage optimization: [storage-optimization.md](storage-optimization.md)
 - Gas model: [gas-model.md](gas-model.md)
 - Testing & debugging: [testing.md](testing.md)
+- mega-evme local replay/debugging: [mega-evme.md](mega-evme.md)
 - Security considerations: [security.md](security.md)
 - ERC-7710 delegations: [erc7710-delegations.md](erc7710-delegations.md)
 - MetaMask Smart Accounts: [smart-accounts.md](smart-accounts.md)

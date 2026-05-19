@@ -47,7 +47,8 @@ clawdhub install megaeth-developer
 ├── smart-contracts.md        # MegaEVM patterns, volatile data, predeploys
 ├── storage-optimization.md   # SSTORE costs, Solady RedBlackTreeLib
 ├── gas-model.md              # Gas costs, estimation, base fee
-├── testing.md                # mega-evme, Foundry, debugging
+├── testing.md                # Foundry/testing guidance
+├── mega-evme.md              # mega-evme local replay/debugging workflow
 ├── security.md               # Vulnerabilities and prevention
 ├── erc7710-delegations.md    # ERC-7710 delegation framework, caveats, permissions
 ├── smart-accounts.md         # MetaMask Smart Accounts Kit, signers, user operations
@@ -68,6 +69,7 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 - Storage optimization and gas costs
 - Real-time WebSocket subscriptions
 - Debugging failed transactions
+- Replaying or locally debugging MegaETH transactions with mega-evme
 
 ### Example Prompts
 
