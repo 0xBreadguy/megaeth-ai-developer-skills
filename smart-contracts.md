@@ -1,5 +1,7 @@
 # Smart Contract Patterns (MegaEVM)
 
+> **Spec-awareness note:** Most guidance here targets stable, activated MegaEVM behavior. REX5 introduces additional system-contract behavior (for example `SequencerRegistry`, dynamic system-address resolution, and Oracle v2.0.0 semantics) but remains unstable unless explicitly activated on the network you are targeting.
+
 ## MegaEVM vs Standard EVM
 
 MegaEVM is fully compatible with Ethereum contracts but has different:

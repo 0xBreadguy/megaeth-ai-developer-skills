@@ -1,6 +1,6 @@
 ---
 name: megaeth-developer
-description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, debugging with mega-evme, drand-based verifiable randomness (VRF) via the predeployed DrandOracleQuicknet verifier, Meridian x402 payments on MegaETH (seller-side settlement plus buyer-side USDm forwarder approvals and EIP-712 authorizations), and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, implementing lotteries/reveals/games with verifiable randomness, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, integrating Meridian/x402 paid APIs or agent actions, hosting websites on-chain with Warren, or integrating MegaNames (.mega naming service) for name registration, resolution, subdomains, subdomain marketplace (selling/buying subdomains with token gating), and text records.
+description: End-to-end MegaETH development playbook (May 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for synchronous receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, spec-version awareness through REX5, WebSocket keepalive, bridging from Ethereum, Privy headless signing for low-latency flows, debugging with mega-evme, drand-based verifiable randomness (VRF) via the predeployed DrandOracleQuicknet verifier, Meridian x402 payments on MegaETH (seller-side settlement plus buyer-side USDm forwarder approvals and EIP-712 authorizations), and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, implementing lotteries/reveals/games with verifiable randomness, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, integrating Meridian/x402 paid APIs or agent actions, hosting websites on-chain with Warren, or integrating MegaNames (.mega naming service) for name registration, resolution, subdomains, subdomain marketplace (selling/buying subdomains with token gating), and text records.
 ---
 
 # MegaETH Development Skill
@@ -30,6 +30,12 @@ Use this Skill when the user asks for:
 - MegaNames (.mega naming service) — registration, resolution, subdomains, subdomain marketplace, text records
 - Verifiable randomness with drand VRF (`DrandOracleQuicknet`) for lotteries, reveals, and game mechanics
 
+## Spec-awareness guardrails
+- MegaETH behavior is spec-versioned: `EQUIVALENCE → MINI_REX → REX → REX1 → REX2 → REX3 → REX4 → REX5`
+- Treat **REX5 as unstable** unless the user explicitly asks about the current unstable spec or local node behavior
+- Do not assume SequencerRegistry, dynamic system-address behavior, or Oracle v2.0.0 semantics are activated everywhere by default
+- Distinguish protocol-level real-time behavior from end-to-end RPC latency when giving performance guidance
+
 ## Chain Configuration
 
 | Network | Chain ID | RPC | Explorer |
@@ -47,8 +53,9 @@ Use this Skill when the user asks for:
 - Prefer `verifyNormalized` and plan reveal liveness (user, relayer, keeper)
 
 ### 1. Transaction submission: eth_sendRawTransactionSync first
-- Use `eth_sendRawTransactionSync` (EIP-7966) — returns receipt in <10ms
-- Eliminates polling for `eth_getTransactionReceipt`
+- Use `eth_sendRawTransactionSync` (EIP-7966) for synchronous receipt return
+- This usually eliminates the need to poll `eth_getTransactionReceipt`
+- Do not describe this as guaranteed sub-10ms end-to-end UX; network and RPC latency still matter
 - Docs: https://docs.megaeth.com/realtime-api
 
 ### 2. RPC: Multicall for eth_call batching (v2.0.14+)

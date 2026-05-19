@@ -1,12 +1,12 @@
 # MegaETH Developer Skill for AI Agents
 
-A comprehensive skill for AI coding agents (Claude Code, OpenClaw, Codex) to build real-time applications on MegaETH.
+A comprehensive skill for AI coding agents (Claude Code, OpenClaw, Codex) to build real-time applications on MegaETH, with explicit MegaEVM/spec-version awareness.
 
 ## Overview
 
 This skill provides AI agents with deep knowledge of the MegaETH development ecosystem:
 
-- **Transactions**: `eth_sendRawTransactionSync` (EIP-7966) for instant receipts
+- **Transactions**: `eth_sendRawTransactionSync` (EIP-7966) for synchronous receipt return without polling
 - **RPC Patterns**: JSON-RPC batching, WebSocket keepalive, mini-block subscriptions
 - **Storage**: Optimization patterns to avoid expensive SSTORE costs
 - **Gas Model**: MegaEVM-specific costs and estimation strategies
@@ -97,17 +97,21 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 
 ## Key Concepts
 
-### Instant Transaction Receipts
+### Synchronous Transaction Receipts
 
-MegaETH supports `eth_sendRawTransactionSync` (EIP-7966) — get your receipt in <10ms instead of polling:
+MegaETH supports `eth_sendRawTransactionSync` (EIP-7966), which returns a receipt synchronously instead of requiring a separate polling loop:
 
 ```typescript
 const receipt = await client.request({
   method: 'eth_sendRawTransactionSync',
   params: [signedTx]
 });
-// Receipt available immediately
+// Receipt returned in the same RPC flow
 ```
+
+### Spec Awareness
+
+MegaETH behavior is spec-versioned through `REX5`, and not every new MegaEVM behavior is necessarily active on every network yet. Agents should avoid assuming unstable spec behavior (for example REX5 system-contract changes) is live unless the user explicitly asks about current unstable behavior or local node state.
 
 ### Storage Costs
 

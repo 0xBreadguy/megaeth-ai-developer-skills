@@ -13,7 +13,7 @@ Third-party providers: Alchemy, QuickNode (recommended for geo-distributed acces
 
 ### Instant Transaction Receipts
 
-MegaETH supports synchronous transaction submission — get your receipt in <10ms instead of polling.
+MegaETH supports synchronous transaction submission — the RPC can return a receipt directly instead of requiring a separate polling loop.
 
 **Two equivalent methods:**
 
@@ -210,7 +210,7 @@ MegaETH's real-time capabilities shine when you optimize for low latency. Here's
 |--------|------|-----------|
 | eth_chainId | 40ms | **7ms** |
 | eth_getBalance | 140ms | ~50ms |
-| eth_sendRawTransactionSync | 200-450ms | **150-300ms** |
+| eth_sendRawTransactionSync | 200-450ms | **lower-latency receipt return without polling** |
 
 WebSocket is **5-6x faster** for simple calls due to persistent connection.
 
