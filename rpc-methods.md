@@ -22,7 +22,7 @@ MegaETH supports synchronous transaction submission — the RPC can return a rec
 | `realtime_sendRawTransaction` | MegaETH original | Supported |
 | `eth_sendRawTransactionSync` | EIP-7966 standard | Supported (proxied) |
 
-**History:** MegaETH created `realtime_sendRawTransaction` first. Later, `eth_sendRawTransactionSync` was standardized as EIP-7966. MegaETH now proxies both — they are functionally identical. Use whichever you prefer; `eth_sendRawTransactionSync` is recommended for cross-chain compatibility.
+**History:** MegaETH created `realtime_sendRawTransaction` first. Later, `eth_sendRawTransactionSync` was standardized as EIP-7966. MegaETH now supports both and they remain functionally equivalent for developers. Prefer `eth_sendRawTransactionSync` because it is the standardized cross-chain method; keep `realtime_sendRawTransaction` for compatibility with existing MegaETH-specific tooling.
 
 ```bash
 # Both work identically:

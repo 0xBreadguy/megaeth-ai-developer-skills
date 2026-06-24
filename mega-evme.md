@@ -87,8 +87,8 @@ Do not rely only on “it reverted once on mainnet/testnet.”
 
 ## Spec-aware debugging rules
 
-### 1. Always ask which spec behavior matters
-When replaying or diagnosing a tx, check whether the behavior depends on:
+### 1. Start from the current documented MegaEVM / REX5-era baseline
+When replaying or diagnosing a tx, treat the current documented MegaEVM / REX5-era behavior as the default baseline. Only branch into older spec labels when the task explicitly depends on historical differences such as:
 - EQUIVALENCE / MINI_REX / REX / REX1 / REX2 / REX3 / REX4 / REX5
 
 This matters especially for:
@@ -99,15 +99,15 @@ This matters especially for:
 - per-frame resource accounting
 - system-contract semantics
 
-### 2. Do not assume unstable REX5 behavior is live everywhere
-REX5 introduces:
+### 2. Treat older-spec differences as conditional, not the current baseline
+Current MegaETH docs present the REX5-era system-contract set and behavior as part of the documented MegaEVM baseline, including:
 - `SequencerRegistry`
 - dynamic system address resolution
 - Oracle v2.0.0 authority changes
 - caller-account update deduplication
 - stricter keyless trailing-bytes rejection
 
-Treat those as **spec-conditional**, not universal.
+Only treat those as upgrade-conditional when analyzing older historical behavior or an explicitly non-current target environment.
 
 ### 3. Distinguish execution bugs from accounting differences
 Some changes only affect:
@@ -150,7 +150,7 @@ Common MegaEVM-specific suspects:
 ## Oracle / system-contract debugging
 
 Be careful with statements about Oracle/system behavior.
-There are meaningful differences between pre-REX5 and REX5-era semantics.
+There are meaningful differences between older specs and the current REX5-era baseline.
 
 For debugging, verify:
 - whether Oracle storage access actually occurred
@@ -198,7 +198,7 @@ This makes the problem transferable between agents/humans.
 Do not:
 - treat mega-evme as just another generic trace tool
 - ignore spec version when analyzing system-contract behavior
-- assume REX5 behavior is active by default
+- ignore the current documented REX5-era baseline when no historical target has been specified
 - rely only on live RPC replay if reproducibility matters
 - conflate synchronous receipt return with full execution/debug determinism
 

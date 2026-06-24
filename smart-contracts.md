@@ -1,6 +1,6 @@
 # Smart Contract Patterns (MegaEVM)
 
-> **Spec-awareness note:** Most guidance here targets stable, activated MegaEVM behavior. REX5 introduces additional system-contract behavior (for example `SequencerRegistry`, dynamic system-address resolution, and Oracle v2.0.0 semantics) but remains unstable unless explicitly activated on the network you are targeting.
+> **Spec-awareness note:** Most guidance here targets the current documented MegaEVM / REX5-era behavior. Keep upgrade-specific caveats only when debugging historical behavior or validating implementation/spec deltas on older network states.
 
 ## MegaEVM vs Standard EVM
 
@@ -37,7 +37,7 @@ IMegaAccessControl(0x6342000000000000000000000000000000000004).enableVolatileDat
 
 ## Volatile Data Access Control
 
-Accessing block metadata caps the **total** compute gas for the entire transaction to 20M. This cap is **retroactive** — it applies to all compute gas used in the transaction, not just gas consumed after the volatile opcode. If the transaction has already burned more than 20M compute gas before touching `block.timestamp`, it immediately reverts with OOG.
+Accessing block metadata triggers gas detention with a **relative** 20M post-access compute cap. The transaction may consume up to 20M additional compute gas after the volatile access; the cap is transaction-scoped and continues to apply across parent/child/sibling frames.
 
 **Affected opcodes:**
 - `TIMESTAMP`, `NUMBER`, `BLOCKHASH`, `BASEFEE`, `PREVRANDAO`, `GASLIMIT`, `COINBASE`, `BLOBBASEFEE`, `BLOBHASH`
@@ -45,7 +45,7 @@ Accessing block metadata caps the **total** compute gas for the entire transacti
 - Oracle contract SLOAD (also 20M cap since Rex3; was 1M pre-Rex3)
 
 ```solidity
-// ❌ Front-loading does NOT help — cap is retroactive
+// ❌ Front-loading compute does not avoid detention; the 20M post-access budget still applies
 function process() external {
     for (uint i = 0; i < 10000; i++) {
         // Burns >20M compute gas...

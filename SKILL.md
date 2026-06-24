@@ -99,7 +99,7 @@ Always be explicit about:
 - Gas limit (hardcode when possible)
 - Base fee (0.001 gwei, no buffer)
 - Storage costs (new slots are expensive)
-- Volatile data limits (20M total compute gas cap, retroactive, when block.timestamp accessed)
+- Gas detention (20M relative post-access compute cap for volatile-data categories)
 
 ### 4. Deliverables expectations
 When implementing changes, provide:
