@@ -326,7 +326,7 @@ address pointer = SSTORE2.write(data);
 bytes memory data = SSTORE2.read(pointer);
 ```
 
-**Reference implementation:** See [warren-deploy](https://clawdhub.ai/planetai87/warren-deploy) for a complete on-chain website deployment system using SSTORE2 on MegaETH.
+**Reference implementation note:** For end-to-end examples of large-payload SSTORE2 deployment patterns on MegaETH, look to ecosystem-specific skills in Awesome MegaETH AI rather than treating any one application integration as part of this core stack.
 
 ## EIP-6909: Minimal Multi-Token Standard
 

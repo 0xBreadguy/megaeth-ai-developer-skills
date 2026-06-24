@@ -1,6 +1,6 @@
 # USDm Stablecoin on MegaETH
 
-AI coding skill for integrating USDm, MegaETH's native stablecoin. Covers token operations, ERC-2612 permit flows, approvals, balance checks, and integration patterns with MegaNames, Kumbaya DEX, and other MegaETH protocols.
+USDm is a core MegaETH stack primitive: the chain's native stablecoin and a foundational payment/integration asset for developers. Use this file for USDm token operations, ERC-2612 permit flows, approvals, balance checks, and general USDm integration patterns in MegaETH applications.
 
 ## What This Skill Is For
 
@@ -8,7 +8,6 @@ Use this skill when the user asks for:
 - Transferring, approving, or checking USDm balances
 - Using ERC-2612 permit for gasless approvals
 - Integrating USDm payments into contracts or frontends
-- Swapping to/from USDm on Kumbaya DEX
 - Understanding USDm's role in MegaETH's fee model
 
 ## Token Details
@@ -34,7 +33,7 @@ Use this skill when the user asks for:
 
 USDm is issued through Ethena's stablecoin stack (USDtb rails). Reserves are primarily invested in BlackRock's tokenized U.S. Treasury fund (BUIDL) via Securitize. The yield from reserves covers MegaETH's sequencer operating costs, enabling the chain to price gas at-cost rather than extracting margin from users.
 
-USDm is the primary payment token across the MegaETH ecosystem — used by MegaNames, Kumbaya DEX pairs, and other native protocols.
+USDm is the primary payment token across the MegaETH stack and should be treated as a default application/payment primitive when designing MegaETH products.
 
 ## Default Stack Decisions (Opinionated)
 
@@ -202,7 +201,7 @@ await walletClient.writeContract({
 ### Permit + Action in One Transaction (Contract Pattern)
 
 ```solidity
-// Example: approve + register MegaNames in a single call
+// Example: approve + complete a USDm-backed application action in a single call
 function registerWithPermit(
     string calldata label,
     address owner,
@@ -251,32 +250,14 @@ function UsdmBalance({ address }: { address: `0x${string}` }) {
 }
 ```
 
-### Pattern 3: Permit2 (Kumbaya DEX)
+## Where USDm Shows Up In The Stack
 
-Kumbaya DEX uses Uniswap's Permit2 contract. One-time infinite approve to Permit2, then sign per-swap permits:
-
-```typescript
-const PERMIT2 = '0x000000000022D473030F116dDEE9F6B43aC78BA3'
-
-// One-time: approve Permit2 to spend your USDm
-await walletClient.writeContract({
-  address: USDM,
-  abi: erc20Abi,
-  functionName: 'approve',
-  args: [PERMIT2, maxUint256]
-})
-
-// Then use Permit2 signatures for each swap (handled by Kumbaya SDK)
-```
-
-## Where USDm Is Used
-
-| Protocol | Usage |
-|----------|-------|
-| [MegaNames](https://meganame.market) | Registration fees, subdomain marketplace payments |
-| [Kumbaya DEX](https://kumbaya.xyz) | Trading pairs (USDm/WETH, USDm/tokens) |
-| x402 (pending) | Pay-per-request API payments |
-| Gas sponsorship | Paymasters accept USDm for gas abstraction |
+| Area | Why it matters |
+|------|----------------|
+| Application payments | Default stable settlement asset for product/payment flows |
+| Wallet workflows | Common spend and allowance token in user-facing actions |
+| Gas abstraction | Useful anchor asset for paymaster and fee abstraction discussions |
+| Ecosystem integrations | Frequently referenced in canonical MegaETH examples and products |
 
 ## Other Stablecoins on MegaETH
 

@@ -13,7 +13,6 @@ This skill combines multiple sources. Key technical claims are validated against
 **Contributors:**
 - Original patterns: [0xBreadguy/megaeth-ai-developer-skills](https://github.com/0xBreadguy/megaeth-ai-developer-skills)
 - Foundry integration: [clawdybotty/megaeth-foundry-developer](https://github.com/clawdybotty/megaeth-foundry-developer)
-- Privy integration: Extracted from [latency-test](https://github.com/0xBreadguy/latency-test)
 
 ## Primary MegaEVM Specification
 
@@ -41,6 +40,16 @@ The authoritative source for MegaETH's execution layer is now the spec site:
 
 **Agent note:** Prefer `.md` documentation URLs when possible. The docs site supports LLM-friendly retrieval, sitemap discovery, and ask-style query patterns.
 
+## Core MegaETH Stack References
+
+- **MOSS Skills**: https://github.com/megaeth-labs/moss-skills
+- **MegaETH Wallet CLI (MOSS CLI)**: https://github.com/megaeth-labs/wallet-cli
+- **Awesome MegaETH AI**: https://github.com/megaeth-labs/awesome-megaeth-ai
+- **USDm overview / token context**: See this repo's `usdm-stablecoin.md` plus the canonical token registry below
+- **drand VRF docs**: https://docs.megaeth.com/developer-docs/vrf
+
+Use this repo for the core MegaETH stack. Use Awesome MegaETH AI for broader protocol-specific and application-specific skills.
+
 ## Source Code
 
 - **MegaEVM**: https://github.com/megaeth-labs/mega-evm
@@ -64,30 +73,18 @@ Recent examples relevant to agents:
 
 Agents should prefer the token registry over ad hoc explorer scraping when they need canonical token metadata.
 
-## Tools
-
-### Warren Deploy (On-Chain Websites)
-Deploy websites and files permanently on MegaETH using SSTORE2:
-- **Skill**: https://clawdhub.ai/planetai87/warren-deploy
-- **Website**: https://megawarren.xyz
-- **Install**: `clawdhub install warren-deploy`
-
-Features:
-- SSTORE2 bytecode storage (cheap reads)
-- Automatic chunking for large files (up to 500KB)
-- MegaETH-specific gas estimation
-- Stress test workflows
+## Core Developer Tooling
 
 ### mega-evme CLI
-Transaction replay and debugging:
+Transaction replay and MegaEVM-specific debugging:
 ```bash
 git clone https://github.com/megaeth-labs/mega-evm
 cd mega-evm/bin/mega-evme
 cargo build --release
 ```
 
-### Gas Profiler
-Opcode-level gas analysis:
+### Opcode-level gas analysis
+Use MegaEVM's opcode gas profiler when diagnosing low-level execution costs:
 https://github.com/megaeth-labs/mega-evm/blob/main/scripts/trace_opcode_gas.py
 
 ## Block Explorers
@@ -179,18 +176,6 @@ export const megaeth = defineChain({
 });
 ```
 
-## DEX Aggregator
-
-### Kyber Network
-MegaETH uses Kyber Network for token swaps:
-- **Aggregator API**: `https://aggregator-api.kyberswap.com/megaeth/api/v1`
-- **Docs**: https://docs.kyberswap.com/kyberswap-solutions/kyberswap-aggregator
-
-Features:
-- Best-route across multiple DEXs
-- MEV protection
-- Gas-optimized execution
-
 ## Bridges
 
 ### Canonical Bridge (OP Stack)
@@ -230,16 +215,7 @@ Consider runtime monitoring for:
 ## Community
 
 - **Discord**: (contact MegaETH team)
-- **Twitter**: @megaeth_labs
-
-## Delegation Framework & Smart Accounts
-
-- **MetaMask Smart Accounts Kit**: https://www.npmjs.com/package/@metamask/smart-accounts-kit
-- **Smart Accounts Kit docs**: https://docs.metamask.io/smart-accounts-kit
-- **Delegation Framework contracts**: https://github.com/MetaMask/delegation-framework
-- **ERC-7710 standard**: https://eips.ethereum.org/EIPS/eip-7710
-- **ERC-7715 standard**: https://eips.ethereum.org/EIPS/eip-7715
-- **ERC-4337 standard**: https://eips.ethereum.org/EIPS/eip-4337
+- **Twitter**: @megaeth
 
 ## Quick Reference
 

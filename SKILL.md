@@ -1,6 +1,6 @@
 ---
 name: megaeth-developer
-description: End-to-end MegaETH development playbook (Feb 2026). Covers Foundry project setup with MegaETH-specific config, wallet operations, token swaps (Kyber Network), eth_sendRawTransactionSync (EIP-7966) for instant receipts, JSON-RPC batching, real-time mini-block subscriptions, storage-aware contract patterns (Solady RedBlackTreeLib, transient storage), MegaEVM multidimensional gas model, WebSocket keepalive, bridging from Ethereum, Privy headless signing for ultra-low latency, debugging with mega-evme, x402 Permit2 payments on MegaETH (standard flow via x402ExactPermit2Proxy/x402UptoPermit2Proxy at canonical addresses), legacy Meridian x402 payments, and Warren Protocol for on-chain website hosting. Use when building on MegaETH, using Foundry, managing wallets, sending transactions, deploying contracts, integrating Privy embedded wallets, ERC-7710 delegation framework for scoped on-chain permissions, MetaMask Smart Accounts Kit for smart account creation and delegation management, integrating x402 Permit2 payments or Meridian/x402 paid APIs or agent actions, hosting websites on-chain with Warren, or integrating MegaNames (.mega naming service) for name registration, resolution, subdomains, subdomain marketplace (selling/buying subdomains with token gating), and text records.
+description: Opinionated MegaETH development playbook centered on the MegaETH stack: Foundry setup, MegaEVM-aware contract patterns, eth_sendRawTransactionSync (EIP-7966), real-time mini-block subscriptions, MOSS / MOSS CLI / MOSS Skills for wallet and delegated-key workflows, USDm integration patterns, drand VRF as a randomness primitive, and debugging with mega-evme. Use when building on MegaETH, sending transactions, deploying contracts, integrating MOSS-based wallet flows into applications, using USDm in MegaETH product/payment flows, working with drand VRF, or debugging MegaETH-specific behavior. For broader protocol-specific and application-specific skills, see Awesome MegaETH AI.
 ---
 
 # MegaETH Development Skill
@@ -12,7 +12,6 @@ Use this Skill when the user asks for:
 - Deploying and verifying contracts on MegaETH
 - Wallet setup and management on MegaETH
 - Sending transactions, checking balances, token operations
-- Token swaps via Kyber Network aggregator
 - MegaETH dApp frontend (React / Next.js with real-time updates)
 - RPC configuration and transaction flow optimization
 - Smart contract development with MegaEVM considerations
@@ -22,15 +21,12 @@ Use this Skill when the user asks for:
 - Local transaction replay / debugging with mega-evme
 - WebSocket subscriptions and mini-block streaming
 - Bridging ETH from Ethereum to MegaETH
-- Privy integration for headless/automated signing
-- x402 payments on MegaETH (Permit2 — preferred)
-- Meridian / x402 legacy payments on MegaETH
 - Ultra-low latency transaction patterns
-- ERC-7710 delegations (scoped permissions, spending limits, redelegation chains)
-- MetaMask Smart Accounts (ERC-4337 accounts, signers, user operations)
-- Advanced permissions (ERC-7715) via MetaMask
-- MegaNames (.mega naming service) — registration, resolution, subdomains, subdomain marketplace, text records
-- Verifiable randomness with drand VRF (`DrandOracleQuicknet`) for lotteries, reveals, and game mechanics
+- MOSS / MOSS CLI / MOSS Skills for delegated-key wallet workflows in applications
+- Knowing when to use the separate `moss-skills` repo as the focused guide for MOSS application integration
+- USDm as a core stablecoin/payment primitive on MegaETH
+- Verifiable randomness with drand VRF (`DrandOracleQuicknet`) as part of the MegaETH stack
+- ERC-8004 trustless agent patterns and related identity/reputation resources
 
 ## Chain Configuration
 
@@ -113,12 +109,12 @@ When implementing changes, provide:
 - RPC optimization notes if applicable
 
 ## Progressive disclosure (read when needed)
+
+For protocol-specific and application-specific MegaETH skills outside this core stack, use [Awesome MegaETH AI](https://github.com/megaeth-labs/awesome-megaeth-ai).
+
 - Foundry setup & deploy: [foundry-config.md](foundry-config.md)
-- Wallet operations: [wallet-operations.md](wallet-operations.md)
+- Wallet operations (MOSS-first): [wallet-operations.md](wallet-operations.md)
 - Frontend patterns: [frontend-patterns.md](frontend-patterns.md)
-- Privy integration: [privy-integration.md](privy-integration.md)
-- x402 payments (Permit2): [x402-payments.md](x402-payments.md)
-- Meridian payments (legacy): [meridian.md](meridian.md)
 - RPC methods reference: [rpc-methods.md](rpc-methods.md)
 - Smart contract patterns: [smart-contracts.md](smart-contracts.md)
 - Storage optimization: [storage-optimization.md](storage-optimization.md)
@@ -126,9 +122,7 @@ When implementing changes, provide:
 - Testing & debugging: [testing.md](testing.md)
 - mega-evme local replay/debugging: [mega-evme.md](mega-evme.md)
 - Security considerations: [security.md](security.md)
-- ERC-7710 delegations: [erc7710-delegations.md](erc7710-delegations.md)
-- MetaMask Smart Accounts: [smart-accounts.md](smart-accounts.md)
-- Warren Protocol (on-chain websites): [warren.md](warren.md)
-- MegaNames (.mega naming): [meganames.md](meganames.md)
+- USDm integration context: [usdm-stablecoin.md](usdm-stablecoin.md)
 - Verifiable randomness (drand VRF): [vrf-drand.md](vrf-drand.md)
+- ERC-8004 trustless agents: [erc8004-trustless-agents.md](erc8004-trustless-agents.md)
 - Reference links & attribution: [resources.md](resources.md)

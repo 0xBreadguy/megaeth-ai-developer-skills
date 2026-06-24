@@ -1,13 +1,13 @@
 # Verifiable Randomness (drand VRF)
 
-MegaETH provides a predeployed drand verifier contract, `DrandOracleQuicknet`, that lets contracts verify public randomness beacons onchain without trusting an app backend.
+drand VRF is part of the MegaETH developer stack: a chain-available randomness primitive that lets contracts verify public randomness beacons onchain without trusting an app backend.
 
 Use this file when the task involves:
+- commit/reveal design on MegaETH
+- integrating drand quicknet beacons into contracts or backend relayers
 - lotteries, raffles, winner selection
 - NFT trait reveals / randomized mint ordering
 - game mechanics needing public randomness
-- commit/reveal design on MegaETH
-- integrating drand quicknet beacons into contracts or backend relayers
 
 ## What it is
 
@@ -110,7 +110,7 @@ More accurate framing:
 - low-latency async randomness
 - ~3 second cadence via drand quicknet
 
-## Bull case for builders
+## Why this matters in the MegaETH stack
 
 Why this matters on MegaETH:
 - no need to operate your own randomness backend

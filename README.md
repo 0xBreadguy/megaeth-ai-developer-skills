@@ -12,9 +12,10 @@ This skill provides AI agents with deep knowledge of the MegaETH development eco
 - **Gas Model**: MegaEVM-specific costs and estimation strategies
 - **Debugging**: mega-evme CLI for transaction replay and gas profiling
 - **Security**: MegaETH-specific considerations and audit checklists
-- **Meridian**: x402 payments on MegaETH for seller/server and buyer/agent flows
-- **MegaNames**: .mega naming service — registration, resolution, subdomains, subdomain marketplace
-- **VRF / Randomness**: drand quicknet verifier integration for lotteries, reveals, and game mechanics
+- **MOSS**: opinionated MegaETH wallet and delegated-key workflow stack for developers and coding agents
+- **USDm**: MegaETH's native stablecoin and a core application/payment primitive
+- **VRF / Randomness**: drand quicknet verifier integration as part of the MegaETH developer stack
+- **ERC-8004**: trustless agent patterns and identity/reputation resources developers should remain aware of
 
 ## Installation
 
@@ -50,14 +51,10 @@ clawdhub install megaeth-developer
 ├── testing.md                # Foundry/testing + general debugging entrypoint
 ├── mega-evme.md              # mega-evme local replay/spec-aware debugging workflow
 ├── security.md               # Vulnerabilities and prevention
-├── erc7710-delegations.md    # ERC-7710 delegation framework, caveats, permissions
-├── smart-accounts.md         # MetaMask Smart Accounts Kit, signers, user operations
-├── gator-cli.md              # MetaMask Delegation Toolkit CLI for delegations and redemption flows
-├── meridian.md               # Meridian x402 payments on MegaETH
-├── meganames.md              # MegaNames (.mega) — registration, resolution, subdomains, marketplace
-├── warren.md                 # Warren Protocol — on-chain website hosting
+├── erc8004-trustless-agents.md # ERC-8004 trustless agent identity/reputation resources
 ├── vrf-drand.md              # drand VRF / verifiable randomness on MegaETH
-└── resources.md              # Links, tools, explorers, bridges, DEX
+├── usdm-stablecoin.md        # USDm, MegaETH's native stablecoin
+└── resources.md              # Links, tools, explorers, bridges, DEX, MOSS, Awesome index
 ```
 
 ## Usage
@@ -86,18 +83,11 @@ Once installed, your AI agent will automatically use this skill when you ask abo
 "How do I subscribe to real-time mini-blocks?"
 "Optimize this contract for MegaETH storage costs"
 "Debug this failed transaction on MegaETH"
-"Set up ERC-7710 delegations and scoped permissions"
-"Create a MetaMask Smart Account on MegaETH"
-"Use gator-cli with a delegated MegaETH wallet"
-"Set up spending limits and time-bound permissions"
-"Implement redelegation chains"
 "Build a lottery or reveal flow with drand VRF on MegaETH"
 "How should I safely integrate randomness on MegaETH?"
-"Protect an API route with Meridian on MegaETH"
-"Set up a buyer agent to pay with USDm through Meridian"
-"Register a .mega name and resolve it"
-"Set up subdomain sales with token gating"
-"Integrate MegaNames resolution into my dApp"
+"Integrate MOSS wallet workflows into a MegaETH application"
+"Use USDm in a MegaETH application or payment flow"
+"Understand ERC-8004 trustless agent patterns on MegaETH"
 ```
 
 ### Which file should an agent read?
@@ -149,6 +139,18 @@ MegaETH has a stable 0.001 gwei base fee with no EIP-1559 adjustment. The skill 
 
 The skill uses progressive disclosure — the main SKILL.md provides core guidance, and the agent reads specialized files only when needed for specific tasks. This keeps context efficient while providing deep expertise when required.
 
+## Ecosystem Scope
+
+This repo is intentionally opinionated around the core MegaETH developer stack:
+- MegaETH platform/runtime behavior
+- MOSS / MOSS CLI / MOSS Skills for wallet and delegated-key workflows
+- MOSS Skills as the developer/agent guide for integrating MOSS into applications
+- USDm as a core application/payment primitive
+- drand VRF as a core randomness primitive
+- ERC-8004 as an important trustless-agent resource developers should understand
+
+For protocol-specific and application-specific MegaETH skills beyond this core stack, see [Awesome MegaETH AI](https://github.com/megaeth-labs/awesome-megaeth-ai).
+
 ## Content Sources
 
 This skill incorporates best practices from:
@@ -156,8 +158,9 @@ This skill incorporates best practices from:
 - [MegaETH Official Documentation](https://docs.megaeth.com)
 - [MegaEVM Specification](https://github.com/megaeth-labs/mega-evm)
 - [EIP-7966 (eth_sendRawTransactionSync)](https://ethereum-magicians.org/t/eip-7966-eth-sendrawtransactionsync-method/24640)
-- [MetaMask Smart Accounts Kit](https://github.com/MetaMask/smart-accounts-kit)
-- [MetaMask Delegation Toolkit / gator](https://github.com/MetaMask/gator)
+- [MOSS Skills](https://github.com/megaeth-labs/moss-skills)
+- [MegaETH Wallet CLI](https://github.com/megaeth-labs/wallet-cli)
+- [Awesome MegaETH AI](https://github.com/megaeth-labs/awesome-megaeth-ai)
 - MegaETH team technical guidance
 
 ## Contributing
