@@ -73,6 +73,20 @@ Recent examples relevant to agents:
 
 Agents should prefer the token registry over ad hoc explorer scraping when they need canonical token metadata.
 
+## Core Developer Tooling
+
+### mega-evme CLI
+Transaction replay and MegaEVM-specific debugging:
+```bash
+git clone https://github.com/megaeth-labs/mega-evm
+cd mega-evm/bin/mega-evme
+cargo build --release
+```
+
+### Opcode-level gas analysis
+Use MegaEVM's opcode gas profiler when diagnosing low-level execution costs:
+https://github.com/megaeth-labs/mega-evm/blob/main/scripts/trace_opcode_gas.py
+
 ## Block Explorers
 
 | Network | Explorer |
@@ -201,7 +215,7 @@ Consider runtime monitoring for:
 ## Community
 
 - **Discord**: (contact MegaETH team)
-- **Twitter**: @megaeth_labs
+- **Twitter**: @megaeth
 
 ## Quick Reference
 
