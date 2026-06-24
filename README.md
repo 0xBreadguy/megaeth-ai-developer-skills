@@ -1,13 +1,13 @@
 # MegaETH Developer Skill for AI Agents
 
-A comprehensive skill for AI coding agents (Claude Code, OpenClaw, Codex) to build real-time applications on MegaETH, with explicit MegaEVM/spec-version awareness.
+A comprehensive skill for AI coding agents (Claude Code, OpenClaw, Codex) to build real-time applications on the current MegaETH stack. It remains spec-aware for debugging and historical behavior, but treats current MegaEVM / REX5-era behavior as the default baseline.
 
 ## Overview
 
 This skill provides AI agents with deep knowledge of the MegaETH development ecosystem:
 
 - **Transactions**: `eth_sendRawTransactionSync` (EIP-7966) for low-latency synchronous receipt return without polling
-- **RPC Patterns**: JSON-RPC batching, WebSocket keepalive, mini-block subscriptions
+- **RPC Patterns**: Multicall-first `eth_call` batching, WebSocket keepalive, mini-block subscriptions
 - **Storage**: Optimization patterns to avoid expensive SSTORE costs
 - **Gas Model**: MegaEVM-specific costs and estimation strategies
 - **Debugging**: mega-evme CLI for transaction replay and gas profiling
@@ -112,7 +112,7 @@ const receipt = await client.request({
 
 ### Spec Awareness
 
-MegaETH behavior is spec-versioned through `REX5`, and not every new MegaEVM behavior is necessarily active on every network yet. Agents should avoid assuming unstable spec behavior (for example REX5 system-contract changes) is live unless the user explicitly asks about current unstable behavior or local node state.
+MegaETH behavior remains spec-versioned, but this repo treats current documented MegaEVM / REX5-era behavior as the default baseline. Reach for upgrade-specific caveats only when debugging historical behavior, targeting older network states, or validating implementation/spec diffs.
 
 ### Storage Costs
 
