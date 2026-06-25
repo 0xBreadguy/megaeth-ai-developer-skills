@@ -35,26 +35,30 @@ git clone https://github.com/0xBreadguy/megaeth-ai-developer-skills
 ### OpenClaw / ClawdHub
 
 ```bash
-clawdhub install megaeth-developer
+clawdhub install megaeth-ai-developer-skills
 ```
 
 ## Skill Structure
 
 ```
 ├── SKILL.md                  # Main skill (stack decisions, operating procedure)
-├── wallet-operations.md      # Wallet setup, balances, transfers, swaps, bridging
-├── frontend-patterns.md      # React/Next.js, WebSocket, real-time UX
-├── rpc-methods.md            # RPC reference, rate limits, batching
-├── smart-contracts.md        # MegaEVM patterns, volatile data, predeploys
-├── storage-optimization.md   # SSTORE costs, Solady RedBlackTreeLib
-├── gas-model.md              # Gas costs, estimation, base fee
-├── testing.md                # Foundry/testing + general debugging entrypoint
-├── mega-evme.md              # mega-evme local replay/spec-aware debugging workflow
-├── security.md               # Vulnerabilities and prevention
-├── erc8004-trustless-agents.md # ERC-8004 trustless agent identity/reputation resources
-├── vrf-drand.md              # drand VRF / verifiable randomness on MegaETH
-├── usdm-stablecoin.md        # USDm, MegaETH's native stablecoin
-└── resources.md              # Links, tools, explorers, bridges, DEX, MOSS, Awesome index
+└── skills/
+    └── megaeth-developer/
+        ├── SKILL.md
+        └── references/
+            ├── wallet-operations.md
+            ├── frontend-patterns.md
+            ├── rpc-methods.md
+            ├── smart-contracts.md
+            ├── storage-optimization.md
+            ├── gas-model.md
+            ├── testing.md
+            ├── mega-evme.md
+            ├── security.md
+            ├── erc8004-trustless-agents.md
+            ├── vrf-drand.md
+            ├── usdm-stablecoin.md
+            └── resources.md
 ```
 
 ## Usage
